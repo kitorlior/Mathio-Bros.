@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Mathio Bros.sln"
+    "dotnet.defaultSolution": "Mathio Bros.sln",
+    "dotnet.preferCSharpExtension": true
 }
