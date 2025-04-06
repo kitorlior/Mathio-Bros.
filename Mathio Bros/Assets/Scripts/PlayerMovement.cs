@@ -5,6 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody2D rb;
     private Camera cam;
+    private Collider2D coll;
 
     private float inputAxis;
     private Vector2 velocity;
@@ -24,7 +25,26 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        coll = GetComponent<Collider2D>();
         cam = Camera.main;
+    }
+
+    private void OnDisable()
+    {
+        // disable for animations
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        coll.enabled = false;
+        velocity = Vector2.zero;
+        Jumping = false;
+    }
+
+    private void OnEnable()
+    {
+        //return to normal after animations
+        rb.bodyType = RigidbodyType2D.Dynamic;
+        coll.enabled = true;
+        velocity = Vector2.zero;
+        Jumping = false;
     }
 
     private void Update()
@@ -38,7 +58,7 @@ public class PlayerMovement : MonoBehaviour
         ApplyGravity();
     }
 
-    private void HorizontalMovement()
+    private void HorizontalMovement() // handle mario movement
     {
         inputAxis = Input.GetAxis("Horizontal");
         velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, moveSpeed * Time.deltaTime);
@@ -58,7 +78,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void GroundedMovement()
+    private void GroundedMovement() // handle jumping
     {
         velocity.y = Mathf.Max(velocity.y, 0f);
         Jumping = velocity.y > 0f;
@@ -70,7 +90,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void ApplyGravity()
+    private void ApplyGravity() // handle gravity
     {
         bool falling = velocity.y < 0f || !Input.GetButton("Jump");
         float multiplier = falling ? 2f : 1f;
@@ -85,6 +105,7 @@ public class PlayerMovement : MonoBehaviour
         Vector2 position = rb.position;
         position += velocity * Time.fixedDeltaTime;
 
+        //keep player within screen
         Vector2 leftEdge = cam.ScreenToWorldPoint(Vector2.zero);
         Vector2 rightEdge = cam.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
         position.x = Mathf.Clamp(position.x, leftEdge.x + 0.5f, rightEdge.x - 0.5f);
@@ -96,13 +117,13 @@ public class PlayerMovement : MonoBehaviour
     {
         if ( collision.gameObject.layer == LayerMask.NameToLayer("Enemy"))
         {
-            if (transform.DotTest(collision.transform, Vector2.down))
+            if (transform.DotTest(collision.transform, Vector2.down)) // check if landing on top of enemy
             {
-                velocity.y = jumpForce / 2f;
+                velocity.y = jumpForce / 2f; // bounce off enemy
                 Jumping = true;
             }
         }
-        if (collision.gameObject.layer != LayerMask.NameToLayer("PowerUp"))
+        if (collision.gameObject.layer != LayerMask.NameToLayer("PowerUp"))// handle bumping head when jumping
         {
             if (transform.DotTest(collision.transform, Vector2.up))
             {

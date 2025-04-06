@@ -1,5 +1,3 @@
-using System;
-using Unity.Hierarchy;
 using UnityEngine;
 
 public class Goomba : MonoBehaviour
@@ -11,12 +9,15 @@ public class Goomba : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             Player player = collision.gameObject.GetComponent<Player>();
-            if (collision.transform.DotTest(transform, Vector2.down)) { Flatten(); }
-            else { player.Hit(); }
+
+            if (player.starpower) { Hit(); } // when mario starpower, mario hits goomba
+            // flatten when mario lands on goomba
+            else if (collision.transform.DotTest(transform, Vector2.down)) { Flatten(); }
+            else { player.Hit(); } // otherwise hit player
         }
     }
 
-    private void Flatten()
+    private void Flatten() // handle flattning goomba
     {
         GetComponent<Collider2D>().enabled = false;
         GetComponent<EntitiyMovement>().enabled = false;
@@ -29,11 +30,12 @@ public class Goomba : MonoBehaviour
     {
         if (collision.gameObject.layer == LayerMask.NameToLayer("Shell"))
         {
+            // get hit by koopa shell
             Hit();
         }
     }
 
-    private void Hit()
+    private void Hit() // simulate death
     {
         GetComponent<AnimatedSprite>().enabled = false;
         GetComponent<DeathAnimation>().enabled = true;

@@ -11,7 +11,7 @@ public class EntitiyMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        enabled = false;
+        enabled = false; // disable if forgot to in editor
     }
 
     private void OnBecameVisible()
@@ -35,21 +35,21 @@ public class EntitiyMovement : MonoBehaviour
         rb.Sleep();
     }
 
-    private void FixedUpdate()
+    private void FixedUpdate() // handle movement
     {
         velocity.x = direction.x * speed;
         velocity.y += Physics2D.gravity.y * Time.fixedDeltaTime;
 
         rb.MovePosition(rb.position +  velocity * Time.fixedDeltaTime);
 
-        if (rb.Raycast(direction))
+        if (rb.Raycast(direction)) // if hit wall switch direction
         {
             direction = -direction;
         }
 
         if (rb.Raycast(Vector2.down))
         {
-            velocity.y = Mathf.Max(velocity.y, 0f); // so that speed down doesnt accumolate
+            velocity.y = Mathf.Max(velocity.y, 0f); // so that speed down doesnt accumolate when on ground
         }
     }
 }

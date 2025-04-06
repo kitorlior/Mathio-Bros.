@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DeathBarrier : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision) // handle death by falling
     {
         if(collision.gameObject.CompareTag("Player"))
         {

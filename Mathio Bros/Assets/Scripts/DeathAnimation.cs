@@ -18,7 +18,7 @@ public class DeathAnimation : MonoBehaviour
         StartCoroutine(Animate());
     }
 
-    private void UpdateSprite()
+    private void UpdateSprite() // change sprite and bring to front
     {
         spriteRenderer.enabled = true;
         spriteRenderer.sortingOrder = 10;
@@ -30,7 +30,7 @@ public class DeathAnimation : MonoBehaviour
 
     }
 
-    private void DisablePhysics()
+    private void DisablePhysics() // handle disable physics for both player and other entities
     {
         Collider2D[] colliders = GetComponents<Collider2D>();
 
@@ -50,13 +50,13 @@ public class DeathAnimation : MonoBehaviour
 
     }
 
-    private IEnumerator Animate()
+    private IEnumerator Animate() // animate change in position - jump then move below screen
     {
         float elapsed = 0f;
         float duration = 3f;
 
         float jumpVelocity = 10f;
-        float gravity = -36f;
+        float gravity = -36f; 
 
         Vector3 velocity = Vector3.up * jumpVelocity;
 

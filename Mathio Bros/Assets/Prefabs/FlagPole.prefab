@@ -97,7 +97,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5522506300473203189}
   - component: {fileID: 5058302276659546719}
-  m_Layer: 0
+  - component: {fileID: -6651664131533321248}
+  m_Layer: 2
   m_Name: FlagPole
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -120,6 +121,7 @@ Transform:
   - {fileID: 2698999991658296754}
   - {fileID: 7030423502950166503}
   - {fileID: 9165301688958565722}
+  - {fileID: 5242965500708641231}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &5058302276659546719
@@ -168,6 +170,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.25, y: 10}
   m_EdgeRadius: 0
+--- !u!114 &-6651664131533321248
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2656266565893952715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe67943c6aa8c3a4486722c5e653ec7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  flag: {fileID: 7030423502950166503}
+  poleBottom: {fileID: 5242965500708641231}
+  castle: {fileID: 0}
+  speed: 6
 --- !u!1 &7371758507754600592
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,6 +273,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &7545551303883985971
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5242965500708641231}
+  m_Layer: 0
+  m_Name: Bottom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5242965500708641231
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7545551303883985971}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.5, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5522506300473203189}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7871213543197152591
 PrefabInstance:
   m_ObjectHideFlags: 0
