@@ -7,6 +7,9 @@ public class BlockHit : MonoBehaviour
     public int maxHits = -1; // change in editor to positive if not infinate
     public Sprite emptyBlock;
     public GameObject item;
+    public bool isNum = false;
+    public int blockNumber = 0;
+    public Sprite[] numberBlocks;
 
     private bool animating;
 
@@ -16,7 +19,8 @@ public class BlockHit : MonoBehaviour
         {
             if (collision.transform.DotTest(transform, Vector2.up))
             {
-                Hit(); // only hit block when resting and coming from below (and only player)
+                if (isNum) { HitNumbered(); }
+                else { Hit(); } // only hit block when resting and coming from below (and only player)
             }
         }
     }
@@ -36,7 +40,19 @@ public class BlockHit : MonoBehaviour
         {
             Instantiate(item, transform.position, Quaternion.identity);
         }
+             
+        StartCoroutine(Animate()); // animate block
+    }
 
+    private void HitNumbered()
+    {
+
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer.sprite = numberBlocks[blockNumber];//change to correct number
+        
+        EquationLogic equationLogic = GameObject.Find("Equation Visualizer").GetComponent<EquationLogic>();
+        equationLogic.CheckHit(blockNumber);
+        
         StartCoroutine(Animate()); // animate block
     }
 

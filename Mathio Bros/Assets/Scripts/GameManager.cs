@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
+        
     }
 
     private void OnDestroy()
@@ -37,6 +39,9 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         NewGame();
+        TMP_Text livesText = GameObject.Find("Lives Text").GetComponent<TMP_Text>();
+        livesText.text = lives.ToString();
+        Debug.Log("changed lives to " + lives.ToString() + "from start");
     }
 
     private void NewGame()
@@ -68,6 +73,9 @@ public class GameManager : MonoBehaviour
         if (lives > 0)
         {
             SceneManager.LoadScene("Level"); // need to change to handle multiple levels
+            TMP_Text livesText = GameObject.Find("Lives Text").GetComponent<TMP_Text>();
+            livesText.text = lives.ToString();
+            Debug.Log("changed lives to " + lives.ToString() + "from reset level");
         }
         else
         {
@@ -77,7 +85,12 @@ public class GameManager : MonoBehaviour
 
     private void GameOver()
     {
-        SceneManager.LoadScene("Losing page?"); // do we even want this?
+        //SceneManager.LoadScene("Losing page?"); // do we even want this?
+
+        GameObject.Find("Game Over Text").GetComponent<TMP_Text>().enabled = true;
+        GameObject.Find("Mario").GetComponent<PlayerMovement>().enabled = false;
+
+
     }
 
     public void AddCoin()

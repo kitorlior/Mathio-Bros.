@@ -149,3 +149,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHits: 1
   emptyBlock: {fileID: 21300000, guid: 0c057401fbf74454fa3032deae7f0a61, type: 3}
+  item: {fileID: 0}
+  isNum: 0
+  numberBlocks:
+  - {fileID: 21300000, guid: 455e6573d1da48a44815636c8073497f, type: 3}
+  - {fileID: 21300000, guid: 919ab7f6aa99d5e4290e947c9477d2a8, type: 3}
+  - {fileID: 21300000, guid: 4b7dee0bbc0b46a4782b6b1d036dbe2a, type: 3}
+  - {fileID: 21300000, guid: d17cd422bb8732c40997e84dda394da8, type: 3}
+  - {fileID: 21300000, guid: a75c36c113406c94d9034d68ee50291d, type: 3}
+  - {fileID: 21300000, guid: eaed7d4b59133204085a6c7d46a446ba, type: 3}
+  - {fileID: 21300000, guid: 18d5dc1a5d577e0419aea837cdbae28b, type: 3}
+  - {fileID: 21300000, guid: 0715cdc25e9f34b498a3ee95abae433e, type: 3}
+  - {fileID: 21300000, guid: dfbcafe6a785dba4a9c89c6fbb4ec38f, type: 3}
+  - {fileID: 21300000, guid: 78dfd1874712840468f798c2cfb0864f, type: 3}

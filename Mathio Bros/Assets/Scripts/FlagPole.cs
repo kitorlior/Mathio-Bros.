@@ -10,11 +10,18 @@ public class FlagPole : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
+        EquationLogic equationLogic = GameObject.Find("Equation Visualizer").GetComponent<EquationLogic>();
+        if (collision.CompareTag("Player") && !equationLogic.isComplete)
+        {
+            GameManager.Instance.ResetLevel();
+        }
+        else if (collision.CompareTag("Player") )
         {
             StartCoroutine(MoveTo(flag, poleBottom.position)); // move flag to bottom of flagpole
             StartCoroutine(LevelCompleteSequence(collision.transform)); // move mario to castle in a few stages
         }
+        Debug.Log(equationLogic.isComplete);
+        Debug.Log(equationLogic.isFirstHit + ", " + equationLogic.isSecondHit);
     }
 
     private IEnumerator LevelCompleteSequence(Transform player)
