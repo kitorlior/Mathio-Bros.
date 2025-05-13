@@ -1,48 +1,153 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
-import { TextField, Button, Box, Typography } from '@mui/material';
+import { auth } from '../FireBaseDB';
+import { 
+  TextField, 
+  Button, 
+  Box, 
+  Typography, 
+  Paper,
+  Fade,
+  Slide
+} from '@mui/material';
+import { motion } from 'framer-motion';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: 'spring', stiffness: 100 }
+  }
+};
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       window.location.href = '/dashboard';
     } catch (error) {
       alert('Login failed: ' + error.message);
+      setLoading(false);
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 10, p: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Teacher Login
-      </Typography>
-      <form onSubmit={handleLogin}>
-        <TextField
-          label="Email"
-          type="email"
-          fullWidth
-          margin="normal"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <TextField
-          label="Password"
-          type="password"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-          Login
-        </Button>
-      </form>
+    <Box 
+      sx={{ 
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)'
+      }}
+    >
+      <Slide in direction="down" timeout={500}>
+        <Paper 
+          elevation={6} 
+          sx={{ 
+            p: 4, 
+            width: '100%', 
+            maxWidth: 400,
+            borderRadius: 4
+          }}
+          component={motion.div}
+          initial={{ scale: 0.95 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', damping: 10 }}
+        >
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={itemVariants}>
+              <Typography 
+                variant="h4" 
+                gutterBottom 
+                sx={{ 
+                  textAlign: 'center',
+                  mb: 4,
+                  fontWeight: 'bold',
+                  background: 'linear-gradient(45deg, #3f51b5 30%, #2196f3 90%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }}
+              >
+                Teacher Login
+              </Typography>
+            </motion.div>
+
+            <form onSubmit={handleLogin}>
+              <motion.div variants={itemVariants}>
+                <TextField
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  margin="normal"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  sx={{ mb: 2 }}
+                />
+              </motion.div>
+
+              <motion.div variants={itemVariants}>
+                <TextField
+                  label="Password"
+                  type="password"
+                  fullWidth
+                  margin="normal"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  sx={{ mb: 3 }}
+                />
+              </motion.div>
+
+              <motion.div 
+                variants={itemVariants}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button 
+                  type="submit" 
+                  variant="contained" 
+                  fullWidth
+                  size="large"
+                  disabled={loading}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: 2,
+                    background: 'linear-gradient(45deg, #3f51b5 30%, #2196f3 90%)',
+                    boxShadow: '0 3px 5px 2px rgba(33, 150, 243, .3)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 5px 8px 3px rgba(33, 150, 243, .4)'
+                    }
+                  }}
+                >
+                  {loading ? 'Signing In...' : 'Sign In'}
+                </Button>
+              </motion.div>
+            </form>
+          </motion.div>
+        </Paper>
+      </Slide>
     </Box>
   );
 }

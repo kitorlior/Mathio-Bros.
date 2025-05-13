@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ref, onValue } from 'firebase/database';
-import { db } from '../firebase';
+import { db } from '../FireBaseDB';
 import { Box, Typography, Paper, Grid } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
