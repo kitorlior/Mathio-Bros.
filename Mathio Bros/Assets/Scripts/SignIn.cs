@@ -24,7 +24,7 @@ public class SignInPage : MonoBehaviour
 
         // Add sign-up logic here (e.g., save to a database)
         Debug.Log($"Signing up with Username: {username}, Password: {password}");
-
+        
         // Transition to the Main Menu
         SceneManager.LoadScene("MainMenu");
     }
