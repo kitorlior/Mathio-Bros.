@@ -25,7 +25,7 @@ public class LogInPage : MonoBehaviour
 
         // Add authentication logic here (e.g., check against a database)
         Debug.Log($"Logging in with Username: {username}, Password: {password}");
-
+        
         // Transition to the Main Menu
         SceneManager.LoadScene("MainMenu");
     }
