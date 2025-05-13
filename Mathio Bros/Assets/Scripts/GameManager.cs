@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
         NewGame();
         TMP_Text livesText = GameObject.Find("Lives Text").GetComponent<TMP_Text>();
         livesText.text = lives.ToString();
-        Debug.Log("changed lives to " + lives.ToString() + "from start");
+        Debug.Log("changed lives to " + livesText.text + "from start");
     }
 
     private void NewGame()
