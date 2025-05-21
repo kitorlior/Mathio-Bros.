@@ -2075,7 +2075,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b8115afa2eb2c46b2e68be2e160a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: https://www.khanacademy.org/
 --- !u!4 &295680159
 Transform:
   m_ObjectHideFlags: 0
@@ -8423,7 +8422,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 020f64bc21e2d3747b639d3ba45ae101, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelName: 
 --- !u!4 &1455544085
 Transform:
   m_ObjectHideFlags: 0
@@ -12142,7 +12140,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b8115afa2eb2c46b2e68be2e160a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  url: 
 --- !u!114 &2118070436
 MonoBehaviour:
   m_ObjectHideFlags: 0

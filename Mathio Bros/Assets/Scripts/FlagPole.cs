@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class FlagPole : MonoBehaviour
 {
@@ -7,11 +8,13 @@ public class FlagPole : MonoBehaviour
     public Transform poleBottom;
     public Transform castle;
     public float speed = 6f;
+    public string nextLevelName;
+    public bool isEquationLevel;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         EquationLogic equationLogic = GameObject.Find("Equation Visualizer").GetComponent<EquationLogic>();
-        if (collision.CompareTag("Player") && !equationLogic.isComplete)
+        if (isEquationLevel && collision.CompareTag("Player") && !equationLogic.isComplete)
         {
             GameManager.Instance.ResetLevel();
         }
@@ -19,6 +22,8 @@ public class FlagPole : MonoBehaviour
         {
             StartCoroutine(MoveTo(flag, poleBottom.position)); // move flag to bottom of flagpole
             StartCoroutine(LevelCompleteSequence(collision.transform)); // move mario to castle in a few stages
+
+            
         }
         Debug.Log(equationLogic.isComplete);
         Debug.Log(equationLogic.isFirstHit + ", " + equationLogic.isSecondHit);
@@ -35,7 +40,8 @@ public class FlagPole : MonoBehaviour
 
         player.gameObject.SetActive(false); // "mario enters castle"
 
-        // TODO: load next level
+        SceneManager.LoadScene(nextLevelName);
+        Debug.Log("next level!");
     }
 
     private IEnumerator MoveTo(Transform subject, Vector3 dest) // animate change in position
