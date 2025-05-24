@@ -46,6 +46,20 @@ export default function Login() {
       setLoading(false);
     }
   };
+ 
+signInWithEmailAndPassword(auth, email, password)
+  .then((userCredential) => {
+    const user = userCredential.user;
+    console.log("Logged in:", user);
+  })
+.catch((error) => {
+  if (error.code === "auth/too-many-requests") {
+    alert("Too many failed login attempts. Please try again later.");
+  } else {
+    alert("Login failed: " + error.message);
+  }
+});
+
 
   return (
     <Box 
