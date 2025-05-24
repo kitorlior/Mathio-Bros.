@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref } from "firebase/database";
+import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";  // Add this import
 import { getAnalytics } from "firebase/analytics";
 
@@ -17,6 +17,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);  // Initialize auth
-const analytics = getAnalytics(app);
 
-export { db, ref, auth };  // Export auth
+let analytics;
+try {
+  analytics = getAnalytics(app);
+} catch (error) {
+  console.warn("Analytics initialization failed:", error);
+}
+
+export { db, auth };  // Export auth
