@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public int world {  get; private set; }
     public int stage { get; private set; }
 
+    public string levelName;
+
     //TODO: decide if we want lives and coins - maybe just reset unless player specifically quits to main menu?
     public int lives { get; private set; }
     public int coins { get; private set; }
@@ -62,6 +64,8 @@ public class GameManager : MonoBehaviour
     {        
         //LoadLevel(1, 1);        
         lives = 3;
+        //LoadLevel(1, 1);
+        SceneManager.LoadScene(levelName);
         coins = 0;
 
         if (SceneManager.GetActiveScene().name != "Level")
@@ -92,7 +96,10 @@ public class GameManager : MonoBehaviour
 
         if (lives > 0)
         {
-            SceneManager.LoadScene("Level");
+            SceneManager.LoadScene(levelName); // need to change to handle multiple levels
+            TMP_Text livesText = GameObject.Find("Lives Text").GetComponent<TMP_Text>();
+            livesText.text = lives.ToString();
+            Debug.Log("changed lives to " + lives.ToString() + "from reset level");
         }
         else
         {
