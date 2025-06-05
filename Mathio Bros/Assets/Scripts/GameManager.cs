@@ -92,7 +92,7 @@ public class GameManager : MonoBehaviour
     public void ResetLevel()
     {
         lives--;
-        UpdateLivesUI(); // Update UI immediately
+        
 
         if (lives > 0)
         {
@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
+        UpdateLivesUI(); // Update UI immediately
     }
 
     private void GameOver()
