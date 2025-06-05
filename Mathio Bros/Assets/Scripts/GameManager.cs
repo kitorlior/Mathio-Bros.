@@ -5,10 +5,10 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance {  get; private set; }
+    public static GameManager Instance { get; private set; }
 
     //do we need world and stage??
-    public int world {  get; private set; }
+    public int world { get; private set; }
     public int stage { get; private set; }
 
     public string levelName;
@@ -19,17 +19,17 @@ public class GameManager : MonoBehaviour
     public event System.Action<int> OnLivesChanged;
 
     private void Awake()
-{
-    if (Instance != null && Instance != this)
     {
-        Destroy(gameObject);
-        return;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
-    Instance = this;
-    DontDestroyOnLoad(gameObject);
-}
-    
     private void OnDestroy()
     {
         if (Instance == this)
@@ -40,12 +40,12 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-         if (lives <= 0) // Only call NewGame once
+        if (lives <= 0) // Only call NewGame once
         {
             NewGame(); // Initializes lives and coins and loads the level
-        }  
-        yield return null;      
-        UpdateLivesUI();      
+        }
+        yield return null;
+        UpdateLivesUI();
     }
     private void UpdateLivesUI()
     {
@@ -58,10 +58,10 @@ public class GameManager : MonoBehaviour
 
         // Notify any listeners
         OnLivesChanged?.Invoke(lives);
-    }   
+    }
 
     private void NewGame()
-    {        
+    {
         //LoadLevel(1, 1);        
         lives = 3;
         //LoadLevel(1, 1);
@@ -88,11 +88,11 @@ public class GameManager : MonoBehaviour
     {
         Invoke(nameof(ResetLevel), delay);
     }
-   
+
     public void ResetLevel()
     {
         lives--;
-        UpdateLivesUI(); // Update UI immediately
+        
 
         if (lives > 0)
         {
@@ -105,6 +105,7 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
+        UpdateLivesUI(); // Update UI immediately
     }
 
     private void GameOver()
