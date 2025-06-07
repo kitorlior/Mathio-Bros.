@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../FireBaseDB';
-import { 
-  TextField, 
-  Button, 
-  Box, 
-  Typography, 
-  Paper,
-  Fade,
-  Slide
-} from '@mui/material';
+import { TextField, Button, Box, Typography, Paper, Slide } from '@mui/material';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 // Animation variants
 const containerVariants = {
@@ -34,16 +27,33 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent form submission
+
+    // Validate input fields
+    if (!email || !password) {
+      alert('Please enter both email and password.');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      window.location.href = '/dashboard';
+      navigate('/dashboard'); // Navigate to the dashboard on successful login
     } catch (error) {
-      alert('Login failed: ' + error.message);
       setLoading(false);
+      if (error.code === 'auth/too-many-requests') {
+        alert('Too many failed login attempts. Please try again later.');
+      } else if (error.code === 'auth/wrong-password') {
+        alert('Incorrect password. Please try again.');
+      } else if (error.code === 'auth/user-not-found') {
+        alert('No user found with this email.');
+      } else {
+        alert('Login failed. Please try again.');
+      }
     }
   };
 

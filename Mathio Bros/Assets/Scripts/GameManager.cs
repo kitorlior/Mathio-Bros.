@@ -68,9 +68,9 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(levelName);
         coins = 0;
 
-        if (SceneManager.GetActiveScene().name != "Level")
+        if (SceneManager.GetActiveScene().name != levelName)
         {
-            SceneManager.LoadScene("Level");
+            SceneManager.LoadScene(levelName);
         }
     }
 
