@@ -3,62 +3,26 @@ import { ref, onValue, update, push, set } from 'firebase/database';
 import { db } from '../FireBaseDB';
 import { 
   Box, Typography, Paper, Grid, Button, 
-  Tabs, Tab, List, ListItem, ListItemText,
-  Chip, IconButton, Dialog, DialogTitle, 
+  Tabs, Tab, IconButton, Dialog, DialogTitle, 
   DialogContent, TextField, DialogActions,
-  Avatar, LinearProgress, Divider, Badge,
+  Avatar, LinearProgress, Badge,
   Card, CardContent, CardHeader, Menu, MenuItem, 
-  ListItemAvatar, ListItemIcon
+  ListItemIcon
 } from '@mui/material';
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, Legend, 
-  PieChart, Pie, Cell, ResponsiveContainer, AreaChart, Area,
-  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
-} from 'recharts';
-import {
-  Person, Class, School, Edit, 
-  Add, Delete, Refresh, LockReset,
-  MoreVert, Email, BarChart as BarChartIcon,
-  Timeline, Assessment, Group, Star,
-  Close
+  BarChart as BarChartIcon, Timeline, Assessment, Group, Star,
+  Person, Class, Edit, Add, Delete, Refresh, LockReset, MoreVert
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { styled } from '@mui/material/styles';
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, Legend,
+  PieChart, Pie, Cell,
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar
+} from 'recharts';
 
-// Color scheme
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 const GRADIENT_COLORS = ['#3f51b5', '#2196f3'];
-
-// Mock data generators (replace with real data)
-const generatePlayerData = (count) => {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `player${i}`,
-    name: `Student ${i+1}`,
-    level: Math.floor(Math.random() * 10) + 1,
-    score: Math.floor(Math.random() * 1000),
-    timeSpent: (Math.random() * 50).toFixed(1),
-    avatar: `https://i.pravatar.cc/150?img=${i+10}`,
-    lastActive: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
-  }));
-};
-
-const generateClassData = () => {
-  return [
-    { id: 'class1', name: 'Math 101', students: 15, progress: 68 },
-    { id: 'class2', name: 'Algebra II', students: 12, progress: 82 },
-    { id: 'class3', name: 'Geometry', students: 18, progress: 54 }
-  ];
-};
-
-const generatePerformanceData = () => {
-  return [
-    { subject: 'Addition', score: 85 },
-    { subject: 'Subtraction', score: 78 },
-    { subject: 'Multiplication', score: 92 },
-    { subject: 'Division', score: 65 },
-    { subject: 'Equations', score: 88 }
-  ];
-};
 
 const SmallAvatar = styled(Avatar)(({ theme }) => ({
   width: 22,
@@ -67,101 +31,147 @@ const SmallAvatar = styled(Avatar)(({ theme }) => ({
 }));
 
 export default function TeacherDashboard() {
-  const [players, setPlayers] = useState(generatePlayerData(12));
-  const [classes, setClasses] = useState(generateClassData());
+  // State
+  const [players, setPlayers] = useState([]);
+  const [classes, setClasses] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [selectedClass, setSelectedClass] = useState(null);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
   const [classDialogOpen, setClassDialogOpen] = useState(false);
-  const [newPlayer, setNewPlayer] = useState({ name: '', email: '' });
-  const [newClass, setNewClass] = useState({ name: '', description: '' });
+  const [newPlayer, setNewPlayer] = useState({ name: '', email: '', class: '' });
+  const [newClass, setNewClass] = useState({ name: '', description: '', teacher: '', students: 0 });
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [playersLoading, setPlayersLoading] = useState(true);
+  const [classesLoading, setClassesLoading] = useState(true);
 
   // Fetch real data from Firebase
   useEffect(() => {
     const playersRef = ref(db, 'players');
-    onValue(playersRef, (snapshot) => {
+    const classesRef = ref(db, 'classes');
+
+    const unsubPlayers = onValue(playersRef, (snapshot) => {
       const data = snapshot.val();
-      if (data) {
-        setPlayers(Object.keys(data).map(key => ({ id: key, ...data[key] })));
-      }
+      setPlayers(data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : []);
+      setPlayersLoading(false);
     });
 
-    const classesRef = ref(db, 'classes');
-    onValue(classesRef, (snapshot) => {
+    const unsubClasses = onValue(classesRef, (snapshot) => {
       const data = snapshot.val();
-      if (data) {
-        setClasses(Object.keys(data).map(key => ({ id: key, ...data[key] })));
-      }
+      setClasses(data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : []);
+      setClassesLoading(false);
     });
+
+    return () => {
+      unsubPlayers();
+      unsubClasses();
+    };
   }, []);
 
   // Player actions
-  const handleAddPlayer = () => {
+  const handleAddPlayer = async () => {
     const newPlayerRef = push(ref(db, 'players'));
-    set(newPlayerRef, {
+    await set(newPlayerRef, {
       ...newPlayer,
       level: 1,
       score: 0,
       joinDate: new Date().toISOString(),
-      lastActive: new Date().toISOString()
+      lastActive: new Date().toISOString(),
+      progress: 0,
+      isActive: true,
+      avatar: `https://i.pravatar.cc/150?u=${newPlayer.email || Math.random()}`
     });
     setPlayerDialogOpen(false);
-    setNewPlayer({ name: '', email: '' });
+    setNewPlayer({ name: '', email: '', class: '' });
+    setSelectedPlayer(null);
   };
 
-  const handleResetPassword = (playerId) => {
-    update(ref(db, `players/${playerId}`), { 
+  const handleUpdatePlayer = async () => {
+    if (!selectedPlayer) return;
+    const playerRef = ref(db, `players/${selectedPlayer.id}`);
+    await update(playerRef, {
+      ...selectedPlayer,
+      ...newPlayer
+    });
+    setPlayerDialogOpen(false);
+    setSelectedPlayer(null);
+    setNewPlayer({ name: '', email: '', class: '' });
+  };
+
+  const handleResetPassword = async (playerId) => {
+    await update(ref(db, `players/${playerId}`), { 
       needsPasswordReset: true 
     });
   };
 
-  const handleUpdatePlayer = () => {
-    // TODO: Implement player update logic
-    setPlayerDialogOpen(false);
-    setSelectedPlayer(null);
-  };
-
   // Class actions
-  const handleAddClass = () => {
+  const handleAddClass = async () => {
     const newClassRef = push(ref(db, 'classes'));
-    set(newClassRef, {
+    await set(newClassRef, {
       ...newClass,
       students: 0,
       progress: 0,
       createdAt: new Date().toISOString()
     });
     setClassDialogOpen(false);
-    setNewClass({ name: '', description: '' });
-  };
-
-  const handleUpdateClass = () => {
-    // TODO: Implement class update logic
-    setClassDialogOpen(false);
+    setNewClass({ name: '', description: '', teacher: '', students: 0 });
     setSelectedClass(null);
   };
 
-  // Data processing
+  const handleUpdateClass = async () => {
+    if (!selectedClass) return;
+    const classRef = ref(db, `classes/${selectedClass.id}`);
+    await update(classRef, {
+      ...selectedClass,
+      ...newClass
+    });
+    setClassDialogOpen(false);
+    setSelectedClass(null);
+    setNewClass({ name: '', description: '', teacher: '', students: 0 });
+  };
+
+  // Dialog openers
+  const openEditPlayerDialog = (player) => {
+    setSelectedPlayer(player);
+    setNewPlayer({ name: player.name, email: player.email, class: player.class || '' });
+    setPlayerDialogOpen(true);
+  };
+
+  const openEditClassDialog = (cls) => {
+    setSelectedClass(cls);
+    setNewClass({ name: cls.name, description: cls.description || '', teacher: cls.teacher || '', students: cls.students || 0 });
+    setClassDialogOpen(true);
+  };
+
+  // Data processing for charts
   const progressData = players.map(p => ({
-    name: p.name || `Player ${p.id.slice(0,4)}`,
-    level: p.level,
-    score: p.score,
-    timeSpent: parseFloat(p.timeSpent)
+    name: p.name || `Player ${p.id?.slice(0,4)}`,
+    level: p.level || 0,
+    score: p.score || 0,
+    timeSpent: parseFloat(p.timeSpent || 0)
   }));
 
   const classDistribution = classes.map(cls => ({
-    name: cls.name,
-    value: cls.students
+    name: cls.name || '',
+    value: cls.students || 0
   }));
 
-  const performanceData = generatePerformanceData();
+  const performanceData = [
+    { subject: 'Addition', score: 85 },
+    { subject: 'Subtraction', score: 90 },
+    { subject: 'Multiplication', score: 75 },
+    { subject: 'Division', score: 80 },
+    { subject: 'Algebra', score: 70 }
+  ];
 
   // Animation variants
   const fadeIn = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.5 } }
   };
+
+  if (playersLoading || classesLoading) return <div>Loading...</div>;
 
   return (
     <Box sx={{ p: 3, background: '#f5f7fa', minHeight: '100vh' }}>
@@ -185,7 +195,11 @@ export default function TeacherDashboard() {
             <Button 
               variant="contained" 
               startIcon={<Add />}
-              onClick={() => setPlayerDialogOpen(true)}
+              onClick={() => {
+                setSelectedPlayer(null);
+                setNewPlayer({ name: '', email: '', class: '' });
+                setPlayerDialogOpen(true);
+              }}
               sx={{ mr: 2 }}
             >
               Add Student
@@ -193,7 +207,11 @@ export default function TeacherDashboard() {
             <Button 
               variant="outlined" 
               startIcon={<Group />}
-              onClick={() => setClassDialogOpen(true)}
+              onClick={() => {
+                setSelectedClass(null);
+                setNewClass({ name: '', description: '', teacher: '', students: 0 });
+                setClassDialogOpen(true);
+              }}
             >
               Create Class
             </Button>
@@ -292,125 +310,132 @@ export default function TeacherDashboard() {
         </Paper>
 
         {/* Tab content */}
-        {activeTab === 0 && (
-          <Grid container spacing={3}>
-            {/* Progress chart */}
-            <Grid item xs={12} md={8}>
-              <Paper sx={{ 
-                p: 3, 
-                height: '100%',
-                borderRadius: 4,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-              }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Timeline color="primary" sx={{ mr: 1 }} />
-                  <Typography variant="h6">Class Progress</Typography>
-                </Box>
-                <ResponsiveContainer width="100%" height={400}>
-                  <AreaChart data={progressData}>
-                    <defs>
-                      <linearGradient id="colorLevel" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor={GRADIENT_COLORS[0]} stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor={GRADIENT_COLORS[1]} stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Area 
-                      type="monotone" 
-                      dataKey="level" 
-                      stroke={GRADIENT_COLORS[0]} 
-                      fillOpacity={1} 
-                      fill="url(#colorLevel)" 
-                      name="Level"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Paper>
-            </Grid>
+{activeTab === 0 && (
+  <Grid 
+    container 
+    spacing={4} 
+    sx={{ width: '100%', m: 0 }}
+    justifyContent="center" 
+    alignItems="stretch"
+  >
+    {/* Progress Chart */}
+    <Grid item xs={12} md={6} lg={4} sx={{ display: 'flex' }}>
+      <Paper sx={{
+        p: 3,
+        borderRadius: 4,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        minWidth: 300,
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Timeline color="primary" sx={{ mr: 1 }} />
+          <Typography variant="h6">Class Progress</Typography>
+        </Box>
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={progressData}>
+            <defs>
+              <linearGradient id="colorLevel" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={GRADIENT_COLORS[0]} stopOpacity={0.8}/>
+                <stop offset="95%" stopColor={GRADIENT_COLORS[1]} stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Area
+              type="monotone"
+              dataKey="level"
+              stroke={GRADIENT_COLORS[0]}
+              fillOpacity={1}
+              fill="url(#colorLevel)"
+              name="Level"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </Paper>
+    </Grid>
 
-            {/* Right side charts */}
-            <Grid item xs={12} md={4}>
-              <Grid container spacing={3}>
-                <Grid item xs={12}>
-                  <Paper sx={{ 
-                    p: 3, 
-                    height: '100%',
-                    borderRadius: 4,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                  }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <PieChart color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="h6">Class Distribution</Typography>
-                    </Box>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <PieChart>
-                        <Pie
-                          data={classDistribution}
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {classDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </Paper>
-                </Grid>
-                <Grid item xs={12}>
-                  <Paper sx={{ 
-                    p: 3, 
-                    height: '100%',
-                    borderRadius: 4,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-                  }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      <Assessment color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="h6">Skill Radar</Typography>
-                    </Box>
-                    <ResponsiveContainer width="100%" height={200}>
-                      <RadarChart cx="50%" cy="50%" outerRadius="80%" data={performanceData}>
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="subject" />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                        <Radar 
-                          name="Performance" 
-                          dataKey="score" 
-                          stroke="#3f51b5" 
-                          fill="#3f51b5" 
-                          fillOpacity={0.6} 
-                        />
-                        <Tooltip />
-                      </RadarChart>
-                    </ResponsiveContainer>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        )}
+    {/* Class Distribution */}
+    <Grid item xs={12} md={6} lg={4} sx={{ display: 'flex' }}>
+      <Paper sx={{
+        p: 3,
+        borderRadius: 4,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        minWidth: 300,
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <PieChart color="primary" sx={{ mr: 1 }} />
+          <Typography variant="h6">Class Distribution</Typography>
+        </Box>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={classDistribution}
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            >
+              {classDistribution.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </Paper>
+    </Grid>
+
+    {/* Skill Radar */}
+    <Grid item xs={12} md={6} lg={4} sx={{ display: 'flex' }}>
+      <Paper sx={{
+        p: 3,
+        borderRadius: 4,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        minWidth: 300,
+      }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Assessment color="primary" sx={{ mr: 1 }} />
+          <Typography variant="h6">Skill Radar</Typography>
+        </Box>
+        <ResponsiveContainer width="100%" height={300}>
+          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={performanceData}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="subject" />
+            <PolarRadiusAxis angle={30} domain={[0, 100]} />
+            <Radar
+              name="Performance"
+              dataKey="score"
+              stroke="#3f51b5"
+              fill="#3f51b5"
+              fillOpacity={0.6}
+            />
+            <Tooltip />
+          </RadarChart>
+        </ResponsiveContainer>
+      </Paper>
+    </Grid>
+  </Grid>
+)}
 
         {/* Students tab */}
         {activeTab === 1 && (
-          <Paper sx={{ 
-            p: 3,
-            borderRadius: 4,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-          }}>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 3
-            }}>
+          <Paper sx={{ p: 3, borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Person color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6">Student Management</Typography>
@@ -423,7 +448,6 @@ export default function TeacherDashboard() {
                 Refresh
               </Button>
             </Box>
-            
             <Grid container spacing={3}>
               {players.map(player => (
                 <Grid item xs={12} sm={6} md={4} key={player.id}>
@@ -431,9 +455,7 @@ export default function TeacherDashboard() {
                     borderRadius: 4,
                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                     transition: 'transform 0.3s',
-                    '&:hover': {
-                      transform: 'translateY(-5px)'
-                    }
+                    '&:hover': { transform: 'translateY(-5px)' }
                   }}>
                     <CardHeader
                       avatar={
@@ -454,7 +476,7 @@ export default function TeacherDashboard() {
                             />
                           }
                         >
-                          <Avatar alt={player.name} src={player.avatar} />
+                          <Avatar alt={player.name} src={player.avatar || ''} />
                         </Badge>
                       }
                       action={
@@ -474,12 +496,12 @@ export default function TeacherDashboard() {
                         <Typography variant="body2" fontWeight="bold">{player.score}</Typography>
                       </Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                        <Typography variant="body2">Time Spent:</Typography>
-                        <Typography variant="body2" fontWeight="bold">{player.timeSpent}h</Typography>
+                        <Typography variant="body2">Class:</Typography>
+                        <Typography variant="body2" fontWeight="bold">{player.class}</Typography>
                       </Box>
                       <LinearProgress 
                         variant="determinate"
-                        value={player.progress}
+                        value={player.progress || 0}
                         sx={{ height: 10, borderRadius: 5 }}
                       />
                     </CardContent>
@@ -487,7 +509,6 @@ export default function TeacherDashboard() {
                 </Grid>
               ))}
             </Grid>
-
             {/* Player context menu */}
             <Menu
               anchorEl={anchorEl}
@@ -495,24 +516,13 @@ export default function TeacherDashboard() {
               onClose={() => setAnchorEl(null)}
               PaperProps={{
                 elevation: 4,
-                sx: { 
-                  borderRadius: 4,
-                  mt: 1,
-                  minWidth: 200
-                }
+                sx: { borderRadius: 4, mt: 1, minWidth: 200 }
               }}
             >
               <MenuItem 
                 onClick={() => {
                   handleResetPassword(selectedPlayer.id);
                   setAnchorEl(null);
-                }}
-                sx={{ 
-                  color: 'text.primary',
-                  '&:hover': {
-                    backgroundColor: 'rgba(63,81,181,0.1)',
-                    color: 'primary.main'
-                  }
                 }}
               >
                 <ListItemIcon>
@@ -522,16 +532,8 @@ export default function TeacherDashboard() {
               </MenuItem>
               <MenuItem 
                 onClick={() => {
-                  setSelectedPlayer(null);
+                  openEditPlayerDialog(selectedPlayer);
                   setAnchorEl(null);
-                  setPlayerDialogOpen(true);
-                }}
-                sx={{ 
-                  color: 'text.primary',
-                  '&:hover': {
-                    backgroundColor: 'rgba(63,81,181,0.1)',
-                    color: 'primary.main'
-                  }
                 }}
               >
                 <ListItemIcon>
@@ -540,19 +542,12 @@ export default function TeacherDashboard() {
                 Edit Details
               </MenuItem>
               <MenuItem 
-                onClick={() => {
-                  const playerRef = ref(db, `players/${selectedPlayer.id}`);
-                  update(playerRef, { 
-                    isActive: false 
-                  });
-                  setAnchorEl(null);
-                }}
-                sx={{ 
-                  color: 'text.primary',
-                  '&:hover': {
-                    backgroundColor: 'rgba(63,81,181,0.1)',
-                    color: 'primary.main'
+                onClick={async () => {
+                  if (selectedPlayer) {
+                    const playerRef = ref(db, `players/${selectedPlayer.id}`);
+                    await update(playerRef, { isActive: false });
                   }
+                  setAnchorEl(null);
                 }}
               >
                 <ListItemIcon>
@@ -566,17 +561,8 @@ export default function TeacherDashboard() {
 
         {/* Classes tab */}
         {activeTab === 2 && (
-          <Paper sx={{ 
-            p: 3,
-            borderRadius: 4,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
-          }}>
-            <Box sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 3
-            }}>
+          <Paper sx={{ p: 3, borderRadius: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Class color="primary" sx={{ mr: 1 }} />
                 <Typography variant="h6">Class Management</Typography>
@@ -589,7 +575,6 @@ export default function TeacherDashboard() {
                 Refresh
               </Button>
             </Box>
-            
             <Grid container spacing={3}>
               {classes.map(cls => (
                 <Grid item xs={12} sm={6} md={4} key={cls.id}>
@@ -597,9 +582,7 @@ export default function TeacherDashboard() {
                     borderRadius: 4,
                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                     transition: 'transform 0.3s',
-                    '&:hover': {
-                      transform: 'translateY(-5px)'
-                    }
+                    '&:hover': { transform: 'translateY(-5px)' }
                   }}>
                     <CardHeader
                       title={cls.name}
@@ -611,21 +594,14 @@ export default function TeacherDashboard() {
                       </Typography>
                       <LinearProgress 
                         variant="determinate"
-                        value={cls.progress}
+                        value={cls.progress || 0}
                         sx={{ height: 10, borderRadius: 5, mb: 2 }}
                       />
                       <Button 
                         variant="contained" 
                         size="small" 
-                        onClick={() => {
-                          setSelectedClass(cls);
-                          setClassDialogOpen(true);
-                        }}
-                        sx={{ 
-                          borderRadius: 4,
-                          textTransform: 'none',
-                          fontSize: 14
-                        }}
+                        onClick={() => openEditClassDialog(cls)}
+                        sx={{ borderRadius: 4, textTransform: 'none', fontSize: 14 }}
                       >
                         View Details
                       </Button>
@@ -634,7 +610,6 @@ export default function TeacherDashboard() {
                 </Grid>
               ))}
             </Grid>
-
             {/* Class dialog */}
             <Dialog
               open={classDialogOpen}
@@ -666,6 +641,15 @@ export default function TeacherDashboard() {
                   rows={4}
                   value={newClass.description}
                   onChange={(e) => setNewClass({ ...newClass, description: e.target.value })}
+                />
+                <TextField
+                  margin="dense"
+                  label="Teacher"
+                  type="text"
+                  fullWidth
+                  variant="outlined"
+                  value={newClass.teacher}
+                  onChange={(e) => setNewClass({ ...newClass, teacher: e.target.value })}
                 />
               </DialogContent>
               <DialogActions>
@@ -714,6 +698,15 @@ export default function TeacherDashboard() {
             variant="outlined"
             value={newPlayer.email}
             onChange={(e) => setNewPlayer({ ...newPlayer, email: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Class"
+            type="text"
+            fullWidth
+            variant="outlined"
+            value={newPlayer.class}
+            onChange={(e) => setNewPlayer({ ...newPlayer, class: e.target.value })}
           />
         </DialogContent>
         <DialogActions>
