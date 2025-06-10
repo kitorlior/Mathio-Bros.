@@ -28,7 +28,7 @@ public class MainMenu : MonoBehaviour
 
     private void OnChooseLevelClicked()
     {
-        SceneManager.LoadScene("LevelSelection");
+        SceneManager.LoadScene("LevelPicker");
     }
 
     private void OnProfileClicked()
