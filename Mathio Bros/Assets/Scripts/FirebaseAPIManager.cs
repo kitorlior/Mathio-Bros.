@@ -4,7 +4,7 @@ using System.Collections;
 
 public class FirebaseAPIManager : MonoBehaviour
 {
-    private const string SERVER_URL = "http://your-server-ip:3000"; // Replace with real IP/host
+    public const string SERVER_URL = "localhost:3000"; // Replace with real IP/host
 
     [System.Serializable]
     public class PlayerData

@@ -41,6 +41,7 @@ public class FlagPole : MonoBehaviour
         player.gameObject.SetActive(false); // "mario enters castle"
 
         SceneManager.LoadScene(nextLevelName);
+        GameManager.Instance.levelName = nextLevelName;
         Debug.Log("next level!");
     }
 

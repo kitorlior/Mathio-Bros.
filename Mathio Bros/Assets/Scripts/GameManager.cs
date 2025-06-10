@@ -72,6 +72,7 @@ public class GameManager : MonoBehaviour
         {
             SceneManager.LoadScene(levelName);
         }
+        UpdateLivesUI();
     }
 
     //private void LoadLevel(int world, int stage) // most likely not going to use this 
@@ -105,6 +106,7 @@ public class GameManager : MonoBehaviour
         {
             GameOver();
         }
+
         UpdateLivesUI(); // Update UI immediately
     }
 
@@ -114,7 +116,7 @@ public class GameManager : MonoBehaviour
 
         GameObject.Find("Game Over Text").GetComponent<TMP_Text>().enabled = true;
         GameObject.Find("Mario").GetComponent<PlayerMovement>().enabled = false;
-        ReturnToMainMenu();
+        Invoke(nameof(ReturnToMainMenu), 2f);
 
 
     }

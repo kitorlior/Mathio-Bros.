@@ -17,11 +17,15 @@ public class EquationLogic : MonoBehaviour
 
     private void Start()
     {
-        string[] parts = equation.Split(' ');
-        firstNumber.text = parts[0];
-        symbol.text = parts[1];
-        secondNumber.text = parts[2];
-        result.text = parts[4];
+        FlagPole flagpole = GameObject.Find("FlagPole").GetComponent<FlagPole>();
+        if (flagpole.isEquationLevel)
+        {
+            string[] parts = equation.Split(' ');
+            firstNumber.text = parts[0];
+            symbol.text = parts[1];
+            secondNumber.text = parts[2];
+            result.text = parts[4];
+        }
     }
 
     public void CheckHit(int number)
