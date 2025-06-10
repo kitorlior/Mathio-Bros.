@@ -3,22 +3,26 @@ using TMPro;
 
 public class EquationLogic : MonoBehaviour
 {
+    private FlagPole flagPole;
+
     public TMP_Text firstNumber;
     public TMP_Text symbol;
     public TMP_Text secondNumber;
     public TMP_Text result;
     public string equation;
+    public string res;
 
     public bool isFirstHit {  get; private set; } = false;
     public bool isSecondHit { get; private set; } = false;
+    public bool isIntegralHit { get; private set; } = false;
 
     public bool isComplete => isFirstHit && isSecondHit;
 
 
     private void Start()
     {
-        FlagPole flagpole = GameObject.Find("FlagPole").GetComponent<FlagPole>();
-        if (flagpole.isEquationLevel)
+        flagPole = GameObject.Find("FlagPole").GetComponent<FlagPole>();
+        if (flagPole.isEquationLevel)
         {
             string[] parts = equation.Split(' ');
             firstNumber.text = parts[0];
@@ -30,6 +34,11 @@ public class EquationLogic : MonoBehaviour
 
     public void CheckHit(int number)
     {
+        if (flagPole.isIntegralLevel && number.ToString() == res)
+        {
+            isIntegralHit = true;
+            return;
+        }
         if (!isFirstHit && firstNumber.text == number.ToString())
         {
             firstNumber.alpha = 1f;

@@ -10,23 +10,28 @@ public class FlagPole : MonoBehaviour
     public float speed = 6f;
     public string nextLevelName;
     public bool isEquationLevel;
+    public bool isIntegralLevel = false;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         EquationLogic equationLogic = GameObject.Find("Equation Visualizer").GetComponent<EquationLogic>();
-        if (isEquationLevel && collision.CompareTag("Player") && !equationLogic.isComplete)
-        {
-            GameManager.Instance.ResetLevel();
-        }
-        else if (collision.CompareTag("Player") )
+        bool complete = false;
+        bool equationComplete = isEquationLevel && equationLogic.isComplete;
+        bool integralComplete = isIntegralLevel && equationLogic.isIntegralHit;
+        complete = equationComplete || integralComplete || !(isEquationLevel && isIntegralLevel);
+        Debug.Log("isComplete: "+ complete);
+        if (!collision.CompareTag("Player"))
+            return;
+        if (complete)
         {
             StartCoroutine(MoveTo(flag, poleBottom.position)); // move flag to bottom of flagpole
             StartCoroutine(LevelCompleteSequence(collision.transform)); // move mario to castle in a few stages
-
-            
         }
-        Debug.Log(equationLogic.isComplete);
-        Debug.Log(equationLogic.isFirstHit + ", " + equationLogic.isSecondHit);
+        else
+        {
+            GameManager.Instance.ResetLevel();
+        }
+        
     }
 
     private IEnumerator LevelCompleteSequence(Transform player)
