@@ -12,7 +12,7 @@ public class SideScroll : MonoBehaviour
         player = GameObject.FindWithTag("Player").transform;
     }
 
-    private void LateUpdate() 
+    private void LateUpdate()
     {
         Vector3 cameraPosition = transform.position;
         cameraPosition.x = Mathf.Max(cameraPosition.x, player.position.x);
