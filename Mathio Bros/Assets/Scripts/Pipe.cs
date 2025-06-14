@@ -21,6 +21,8 @@ public class Pipe : MonoBehaviour
 
     private IEnumerator Enter(Transform player)
     {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //while (!allplayerschose) yield return null;
         player.GetComponent<PlayerMovement>().enabled = false; // stop player movement
 
         Vector3 enteredPosition = transform.position + enterDirection; // final position
@@ -30,7 +32,12 @@ public class Pipe : MonoBehaviour
         yield return new WaitForSeconds(1f); // wait before moving to next location
 
         bool underground = connection.position.y < 0f; // check if undergroun
-        Camera.main.GetComponent<SideScroll>().SetUnderground(underground); // move camera accordingly
+        if (GameManager.Instance.isMulti)
+            Camera.main.GetComponent<SideScroll>().SetUnderground(underground, connection.position.x); // move camera accordingly
+        else
+            Camera.main.GetComponent<SideScroll>().SetUnderground(underground); // move camera accordingly
+
+        Debug.Log("player" + connection.position.x);
 
         if (exitDirection != Vector3.zero) // if exiting a pipe - handle exit animation
         {
@@ -42,6 +49,7 @@ public class Pipe : MonoBehaviour
             player.position = connection.position;
             player.localScale = Vector3.one;
         }
+        //GameManager.Instance.TeleportAllPlayers(connection.position);
 
         player.GetComponent<PlayerMovement>().enabled = true; // resume player movement
     }

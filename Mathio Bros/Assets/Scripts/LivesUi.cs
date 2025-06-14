@@ -16,7 +16,7 @@ public class LivesUI : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnLivesChanged += UpdateLives;
-            UpdateLives(GameManager.Instance.lives); // Show current lives
+            UpdateLives(GameManager.Instance.Lives); // Show current lives
         }
     }
 

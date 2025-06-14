@@ -1,7 +1,8 @@
+using Photon.Pun;
 using System.Collections;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviourPunCallbacks
 {
     public PlayerSpriteRenderer smallRenderer;
     public PlayerSpriteRenderer bigRenderer;
@@ -116,5 +117,11 @@ public class Player : MonoBehaviour
         //return to normal sprite
         activeRenderer.spriteRenderer.color = Color.white;
         starpower = false;
+    }
+
+    [PunRPC]
+    public void Respawn()
+    {
+        transform.position = new Vector2(2.5f, 2.5f);
     }
 }
