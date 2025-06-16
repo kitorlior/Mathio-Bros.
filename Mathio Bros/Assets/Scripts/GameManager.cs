@@ -14,6 +14,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     public event System.Action<int> OnLivesChanged;
     public bool isMulti = false;
 
+    static bool flag = false;
+
     private void Awake()
     {
         if (isMulti)
@@ -114,7 +116,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         if (isMulti)
         {
-            photonView.RPC("UpdateLives", RpcTarget.All, Lives);
+            photonView.RPC("UpdateLives", RpcTarget.All, Lives-1);
         }
         ;
 
@@ -140,7 +142,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     public void MultiResetLevel()
     {
-        Lives--;
+
         if (photonView != null)
         {
             photonView.RPC("ResetLevel", RpcTarget.MasterClient);
@@ -196,12 +198,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     [PunRPC]
     public void TeleportAllPlayers(Vector3 pos)
     {
+
+        Camera.main.GetComponent<SideScroll>().Reset();
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         Debug.Log(players.ToString() + players.Length);
         foreach (GameObject p in players)
         {
             p.transform.position = pos;
-            p.gameObject.SetActive(true);
             Debug.Log("set active, pos = " + pos.ToString());
         }
         Debug.Log("teleported all players from RPC");

@@ -78,6 +78,7 @@ public class SideScroll : MonoBehaviourPunCallbacks
 
     public void Reset()
     {
+        Debug.Log("reset camera");
         transform.position = resetPosition;
     }
 }

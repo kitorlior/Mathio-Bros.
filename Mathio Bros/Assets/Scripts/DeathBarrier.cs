@@ -1,3 +1,4 @@
+using Photon.Pun;
 using UnityEngine;
 
 public class DeathBarrier : MonoBehaviour
@@ -10,10 +11,10 @@ public class DeathBarrier : MonoBehaviour
             if (GameManager.Instance.isMulti)
             {
                 collision.gameObject.transform.position = new Vector3(2.5f, 2.5f, 0f);
+                Debug.Log("Master Client? " + PhotonNetwork.IsMasterClient.ToString());
                 PauseForSeconds(1f);
-                GameManager.Instance.MultiResetLevel();
-                Camera.main.GetComponent<SideScroll>().Reset();
                 collision.gameObject.SetActive(true);
+                GameManager.Instance.MultiResetLevel();
             }
             else
                 GameManager.Instance.ResetLevel();

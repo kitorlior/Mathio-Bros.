@@ -21,7 +21,7 @@ public class Pipe : MonoBehaviour
 
     private IEnumerator Enter(Transform player)
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
         //while (!allplayerschose) yield return null;
         player.GetComponent<PlayerMovement>().enabled = false; // stop player movement
 
