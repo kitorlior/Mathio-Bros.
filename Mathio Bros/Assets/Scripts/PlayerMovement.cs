@@ -1,5 +1,5 @@
-using Unity.VisualScripting;
 using UnityEngine;
+using Photon.Pun;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,9 +13,12 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 8f;
     public float maxJumpHeight = 5f;
     public float maxJumpTime = 1f;
+    public PhotonView view;
 
-    public float jumpForce => (2f * maxJumpHeight) / (maxJumpTime / 2f);
-    public float gravity => (-2f * maxJumpHeight) / Mathf.Pow((maxJumpTime / 2f), 2);
+    //public bool playerchose = false;
+
+    public float JumpForce => (2f * maxJumpHeight) / (maxJumpTime / 2f);
+    public float Gravity => (-2f * maxJumpHeight) / Mathf.Pow((maxJumpTime / 2f), 2);
 
     public bool Grounded { get; private set; }
     public bool Jumping { get; private set; }
@@ -26,6 +29,7 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         coll = GetComponent<Collider2D>();
+        view = GetComponent<PhotonView>();
         cam = Camera.main;
     }
 
@@ -49,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (GameManager.Instance.isMulti && !view.IsMine) { return; }
         HorizontalMovement();
         Grounded = rb.Raycast(Vector2.down);
         if (Grounded)
@@ -85,7 +90,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetButtonDown("Jump"))
         {
-            velocity.y = jumpForce;
+            velocity.y = JumpForce;
             Jumping = true;
         }
     }
@@ -95,9 +100,9 @@ public class PlayerMovement : MonoBehaviour
         bool falling = velocity.y < 0f || !Input.GetButton("Jump");
         float multiplier = falling ? 2f : 1f;
 
-        velocity.y += gravity * Time.deltaTime * multiplier;
+        velocity.y += Gravity * Time.deltaTime * multiplier;
 
-        velocity.y = Mathf.Max(velocity.y, gravity / 2f); //hitting terminal velocity
+        velocity.y = Mathf.Max(velocity.y, Gravity / 2f); //hitting terminal velocity
     }
 
     private void FixedUpdate()
@@ -119,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (transform.DotTest(collision.transform, Vector2.down)) // check if landing on top of enemy
             {
-                velocity.y = jumpForce / 2f; // bounce off enemy
+                velocity.y = JumpForce / 2f; // bounce off enemy
                 Jumping = true;
             }
         }

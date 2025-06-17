@@ -2,32 +2,49 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using Photon.Pun;
 
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance { get; private set; }
 
-    //do we need world and stage??
-    public int world { get; private set; }
-    public int stage { get; private set; }
-
     public string levelName;
-
-    //TODO: decide if we want lives and coins - maybe just reset unless player specifically quits to main menu?
-    public int lives { get; private set; }
-    public int coins { get; private set; }
+    public int Lives { get; private set; }
+    public int Coins { get; private set; }
     public event System.Action<int> OnLivesChanged;
+    public bool isMulti = false;
+
+    static bool flag = false;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        if (isMulti)
         {
-            Destroy(gameObject);
-            return;
+            if (Instance == null)
+            {
+                Instance = this;
+                PhotonView.Get(this).ViewID = 1; // Ensure consistent view ID
+            }
+            else if (Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+        else
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
 
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
+        Lives = 3;
+        Coins = 0;
     }
 
     private void OnDestroy()
@@ -40,107 +57,156 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator Start()
     {
-        if (lives <= 0) // Only call NewGame once
-        {
-            NewGame(); // Initializes lives and coins and loads the level
-        }
         yield return null;
         UpdateLivesUI();
     }
+
     private void UpdateLivesUI()
     {
         TMP_Text livesText = GameObject.Find("Lives Text")?.GetComponent<TMP_Text>();
         if (livesText != null)
         {
-            livesText.text = lives.ToString();
-            Debug.Log("Lives updated to: " + lives);
+            livesText.text = Lives.ToString();
+            Debug.Log("Lives updated to: " + Lives);
         }
+        OnLivesChanged?.Invoke(Lives);
+    }
 
-        // Notify any listeners
-        OnLivesChanged?.Invoke(lives);
+    [PunRPC]
+    public void UpdateLives(int lives)
+    {
+        Lives = lives;
+        Debug.Log($"Lives: {lives}");
+        UpdateLivesUI();
     }
 
     private void NewGame()
     {
-        //LoadLevel(1, 1);        
-        lives = 3;
-        //LoadLevel(1, 1);
-        SceneManager.LoadScene(levelName);
-        coins = 0;
+        Lives = 3;
+        Coins = 0;
 
-        if (SceneManager.GetActiveScene().name != levelName)
+        if (!isMulti)
         {
             SceneManager.LoadScene(levelName);
         }
-        UpdateLivesUI();
+        else if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel(levelName);
+        }
     }
 
-    //private void LoadLevel(int world, int stage) // most likely not going to use this 
-    //{
-    //    this.world = world;
-    //    this.stage = stage;
-
-    //    //SceneManager.LoadScene($"{world}-{stage}"); change for naming levels and make sure scenes are named accordingly
-    //}
-
-    //TODO decide on level names and how to save their names, maybe we need `difficulty - number`? how to save user built levels?
+    public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("MultiLevel");
+        }
+    }
 
     public void ResetLevel(float delay)
     {
         Invoke(nameof(ResetLevel), delay);
     }
 
+    [PunRPC]
     public void ResetLevel()
     {
-        lives--;
-        
+        Debug.Log("Restarting level");
+        if (!isMulti) Lives--;
 
-        if (lives > 0)
+        if (isMulti)
         {
-            SceneManager.LoadScene(levelName); // need to change to handle multiple levels
-            TMP_Text livesText = GameObject.Find("Lives Text").GetComponent<TMP_Text>();
-            livesText.text = lives.ToString();
-            Debug.Log("changed lives to " + lives.ToString() + "from reset level");
+            photonView.RPC("UpdateLives", RpcTarget.All, Lives-1);
+        }
+        ;
+
+        if (Lives > 0)
+        {
+            if (!isMulti)
+            {
+                SceneManager.LoadScene(levelName);
+            }
+            else if (PhotonNetwork.IsMasterClient)
+            {
+                photonView.RPC("TeleportAllPlayers", RpcTarget.All, new Vector3(2.5f, 2.5f, 0f));
+                Debug.Log("Teleported all players");
+            }
         }
         else
         {
             GameOver();
         }
 
-        UpdateLivesUI(); // Update UI immediately
+        UpdateLivesUI();
+    }
+
+    public void MultiResetLevel()
+    {
+
+        if (photonView != null)
+        {
+            photonView.RPC("ResetLevel", RpcTarget.MasterClient);
+        }
     }
 
     private void GameOver()
     {
-        //SceneManager.LoadScene("Losing page?"); // do we even want this?
+        var gameOverText = GameObject.Find("Game Over Text")?.GetComponent<TMP_Text>();
+        if (gameOverText != null)
+        {
+            gameOverText.enabled = true;
+        }
 
-        GameObject.Find("Game Over Text").GetComponent<TMP_Text>().enabled = true;
-        GameObject.Find("Mario").GetComponent<PlayerMovement>().enabled = false;
+        if (!isMulti)
+        {
+            var player = GameObject.Find("Mario")?.GetComponent<PlayerMovement>();
+            if (player != null)
+            {
+                player.enabled = false;
+            }
+        }
+
         Invoke(nameof(ReturnToMainMenu), 2f);
-
-
     }
 
     public void AddCoin()
     {
-        coins++;
-
-        if (coins == 100)
+        Coins++;
+        if (Coins >= 100)
         {
             AddLife();
-            coins = 0;
+            Coins = 0;
         }
     }
 
     public void AddLife()
     {
-        lives++;
-        UpdateLivesUI(); // Update UI when gaining a life
+        Lives++;
+        UpdateLivesUI();
     }
 
     public void ReturnToMainMenu()
     {
-        lives = 3; // Reset only when quitting to menu
+        Lives = 3;
+        if (isMulti)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
         SceneManager.LoadScene("MainMenu");
+    }
+
+    [PunRPC]
+    public void TeleportAllPlayers(Vector3 pos)
+    {
+
+        Camera.main.GetComponent<SideScroll>().Reset();
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        Debug.Log(players.ToString() + players.Length);
+        foreach (GameObject p in players)
+        {
+            p.transform.position = pos;
+            Debug.Log("set active, pos = " + pos.ToString());
+        }
+        Debug.Log("teleported all players from RPC");
     }
 }
