@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class FirebaseAPIManager : MonoBehaviour
 {
-    private const string SERVER_URL = "http://your-server-ip:3000"; // Replace with real IP/host
+    private const string SERVER_URL = "http://localhost:3000"; // Replace with real IP/host
     private static FirebaseAPIManager _instance;
     public static FirebaseAPIManager Instance
     {
@@ -25,9 +25,13 @@ public class FirebaseAPIManager : MonoBehaviour
     public class PlayerData
     {
         public string playerId;
+        public string name;
+        public string email;
         public int level;
         public int score;
         public float timeSpent;
+        public string classId;
+        public string lastActive;
     }
 
     [System.Serializable]

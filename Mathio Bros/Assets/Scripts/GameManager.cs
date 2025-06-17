@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public event System.Action<int> OnLivesChanged;
     public bool isMulti = false;
 
-    static bool flag = false;
+    //static bool flag = false;
 
     private void Awake()
     {

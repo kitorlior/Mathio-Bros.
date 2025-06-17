@@ -7,4 +7,10 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene(sceneName);
     }
+
+    public void logOut()
+    {
+        SaveUserId.Instance.UserId = string.Empty;
+        SceneManager.LoadScene("LandingPage");
+    }
 }

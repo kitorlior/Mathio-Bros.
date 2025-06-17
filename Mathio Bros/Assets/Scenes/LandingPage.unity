@@ -742,7 +742,7 @@ GameObject:
   - component: {fileID: 1343613095}
   - component: {fileID: 1343613094}
   m_Layer: 5
-  m_Name: SignInbtn
+  m_Name: SignUpbtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -821,7 +821,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: SignIn
+          m_StringArgument: SignUp
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1343613095
@@ -994,7 +994,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SignIn
+  m_text: Sign Up
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: b246c4190f4e46ec9352fe15a7b09ce0, type: 2}
@@ -1206,6 +1206,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1831192317}
   m_CullTransparentMesh: 1
+--- !u!1001 &2037396207
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 960
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 540
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1990489772928282446, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7488444629500793854, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
+      propertyPath: m_Name
+      value: UserId
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ab0ea390fc737e6458e6aa0165e656d2, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1215,3 +1272,4 @@ SceneRoots:
   - {fileID: 1083995750}
   - {fileID: 85756668}
   - {fileID: 1052151716}
+  - {fileID: 2037396207}

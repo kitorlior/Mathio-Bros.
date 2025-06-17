@@ -3209,6 +3209,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b07bed1363198224eb741d0c18ccc0b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resetPosition: {x: 12.5, y: 7, z: -10}
   height: 7
   undergroundHeight: -9
 --- !u!4 &821342239 stripped
@@ -4879,6 +4880,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   levelName: Level3
+  isMulti: 0
 --- !u!4 &1455544085
 Transform:
   m_ObjectHideFlags: 0

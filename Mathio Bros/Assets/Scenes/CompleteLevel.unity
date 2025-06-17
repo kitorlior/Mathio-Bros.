@@ -2075,6 +2075,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b8115afa2eb2c46b2e68be2e160a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  url: 
 --- !u!4 &295680159
 Transform:
   m_ObjectHideFlags: 0
@@ -5761,6 +5762,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b07bed1363198224eb741d0c18ccc0b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  resetPosition: {x: 12.5, y: 7, z: -10}
   height: 7
   undergroundHeight: -9
 --- !u!1001 &807760943
@@ -8435,6 +8437,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 020f64bc21e2d3747b639d3ba45ae101, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  levelName: 
+  isMulti: 0
 --- !u!4 &1455544085
 Transform:
   m_ObjectHideFlags: 0
@@ -12153,6 +12157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b8115afa2eb2c46b2e68be2e160a6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  url: 
 --- !u!114 &2118070436
 MonoBehaviour:
   m_ObjectHideFlags: 0

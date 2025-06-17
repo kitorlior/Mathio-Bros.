@@ -8,7 +8,6 @@ public class ProfilePage : MonoBehaviour
     public Text hoursPlayedText;
     public Text levelsSolvedText;
     public Text averageTimeText;
-    public Button backButton;
 
     private void Start()
     {
@@ -18,10 +17,21 @@ public class ProfilePage : MonoBehaviour
         levelsSolvedText.text = "Levels Solved: " + PlayerPrefs.GetInt("LevelsSolved", 0);
         averageTimeText.text = "Average Solving Time: " + PlayerPrefs.GetFloat("AverageTime", 0).ToString("F2") + "s";
 
-        backButton.onClick.AddListener(OnBackClicked);
+        StartCoroutine(FirebaseAPIManager.Instance.GetPlayerData(SaveUserId.Instance.UserId, (success, dataOrError) =>
+        {
+            if (success)
+            {
+                Debug.Log("Received player data: " + dataOrError);
+                // Parse JSON: PlayerData data = JsonUtility.FromJson<PlayerData>(dataOrError);
+            }
+            else
+            {
+                Debug.LogError("Failed to fetch data: " + dataOrError);
+            }
+        }));
     }
 
-    private void OnBackClicked()
+    public void OnBackClicked()
     {
         SceneManager.LoadScene("MainMenu");
     }

@@ -1,23 +1,110 @@
-const express = require('express');
-const admin = require('firebase-admin');
-const cors = require('cors');
+const express = require("express");
+const admin = require("firebase-admin");
+const cors = require("cors");
+const app = express();
+const bcrypt = require("bcryptjs");
+//const signInWithEmailAndPassword = require("firebase/auth");
 
-// Initialize Firebase Admin SDK
-const serviceAccount = require('./serviceAccountKey.json'); // Download from Firebase
+// --- Firebase Admin Initialization --- //
+const serviceAccount = require("./serviceAccountKey.json"); // Replace with your downloaded file
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: 'https://mathio-bros-default-rtdb.firebaseio.com' // Replace with your DB URL
+  databaseURL: "https://mathiobros-default-rtdb.firebaseio.com/", // Replace with your DB URL
 });
 
 const db = admin.database();
-const app = express();
-app.use(cors()); // Allow Unity to call this server
-app.use(express.json()); // Parse JSON requests
+
+// --- Middleware --- //
+app.use(cors());
+app.use(express.json());
 
 // --- API Endpoints --- //
 
-// 1. Save Player Data
-app.post('/savePlayerData', async (req, res) => {
+// 1. Sign Up
+const saltRounds = 10;
+
+app.post("/signup", async (req, res) => {
+  const { email, password, username } = req.body;
+
+  try {
+    // 1. Check if user already exists
+    const existingUserSnap = await db
+      .ref("users")
+      .orderByChild("email")
+      .equalTo(email)
+      .once("value");
+    if (existingUserSnap.exists()) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email already exists" });
+    }
+
+    // 2. Hash the password
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // 3. Create a new user entry
+    const newUserRef = db.ref("users").push();
+    const uid = newUserRef.key;
+
+    await newUserRef.set({
+      email,
+      password: hashedPassword, // hashed!
+      username,
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+    });
+
+    res.status(200).json({ success: true, uid });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+//2. login
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // 1. Find user by email
+    const snapshot = await db
+      .ref("users")
+      .orderByChild("email")
+      .equalTo(email)
+      .once("value");
+    if (!snapshot.exists()) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
+    }
+
+    const userId = Object.keys(snapshot.val())[0];
+    const userData = snapshot.val()[userId];
+
+    // 2. Check password using bcrypt
+    const match = await bcrypt.compare(password, userData.password);
+    if (!match) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
+    }
+
+    // 3. Update last login
+    await db.ref(`users/${userId}/lastLogin`).set(new Date().toISOString());
+
+    // 4. Return user info (no token)
+    res
+      .status(200)
+      .json({ success: true, uid: userId, username: userData.username });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// 3. Save Player Data
+app.post("/savePlayerData", async (req, res) => {
   const { playerId, level, score, timeSpent } = req.body;
 
   try {
@@ -26,119 +113,61 @@ app.post('/savePlayerData', async (req, res) => {
       level,
       score,
       timeSpent,
-      lastUpdated: new Date().toISOString()
+      lastUpdated: new Date().toISOString(),
     });
     res.status(200).send({ success: true });
   } catch (error) {
-    res.status(500).send({ error: 'Failed to save data' });
+    res.status(500).send({ success: false, message: "Failed to save data" });
   }
 });
 
-// 2. Fetch Player Data
-app.get('/getPlayerData/:playerId', async (req, res) => {
+// 4. Get Player Data
+app.get("/getPlayerData/:playerId", async (req, res) => {
   const { playerId } = req.params;
 
   try {
-    const snapshot = await db.ref(`players/${playerId}`).once('value');
+    const snapshot = await db.ref(`players/${playerId}`).once("value");
     const playerData = snapshot.val();
     res.status(200).send(playerData || {});
   } catch (error) {
-    res.status(500).send({ error: 'Failed to fetch data' });
+    res.status(500).send({ success: false, message: "Failed to fetch data" });
   }
 });
 
-// 3. Fetch Level Parameters (e.g., difficulty)
-app.get('/getLevelParams/:levelId', async (req, res) => {
+// 5. Get Level Parameters (optional)
+app.get("/getLevelParams/:levelId", async (req, res) => {
   const { levelId } = req.params;
 
   try {
-    const snapshot = await db.ref(`levels/${levelId}`).once('value');
+    const snapshot = await db.ref(`levels/${levelId}`).once("value");
     const levelParams = snapshot.val();
     res.status(200).send(levelParams || {});
   } catch (error) {
-    res.status(500).send({ error: 'Failed to fetch level data' });
+    res
+      .status(500)
+      .send({ success: false, message: "Failed to fetch level data" });
   }
 });
 
-const { getAuth, createUserWithEmailAndPassword } = require('firebase/auth');
-const { initializeApp } = require('firebase/app');
-
-// Initialize Firebase Auth (Client SDK)
-const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-
-// Sign Up
-app.post('/signup', async (req, res) => {
-  const { email, password, username } = req.body;
+// 6. Check if email or username exists
+app.get("/checkUser", async (req, res) => {
+  const { field, value } = req.query; // field = 'email' or 'username'
 
   try {
-    // 1. Create user in Firebase Auth
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
-
-    // 2. Save additional user data to Realtime DB
-    await db.ref(`users/${uid}`).set({
-      email,
-      username,
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString()
-    });
-
-    res.status(200).send({ success: true, uid });
+    const snapshot = await db
+      .ref("users")
+      .orderByChild(field)
+      .equalTo(value)
+      .once("value");
+    const exists = snapshot.exists();
+    res.status(200).send({ exists });
   } catch (error) {
-    res.status(400).send({ error: error.message });
+    res.status(500).send({ success: false, message: error.message });
   }
 });
 
-const { signInWithEmailAndPassword } = require('firebase/auth');
-
-// Login
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    // 1. Authenticate user
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
-
-    // 2. Update last login time
-    await db.ref(`users/${uid}/lastLogin`).set(new Date().toISOString());
-
-    // 3. Fetch user data
-    const snapshot = await db.ref(`users/${uid}`).once('value');
-    const userData = snapshot.val();
-
-    res.status(200).send({ success: true, user: userData });
-  } catch (error) {
-    res.status(400).send({ error: error.message });
-  }
-});
-
-// Check if username/email exists
-app.get('/checkUser', async (req, res) => {
-    const { field, value } = req.query; // field = 'email' or 'username'
-  
-    try {
-      const snapshot = await db.ref('users').orderByChild(field).equalTo(value).once('value');
-      const exists = snapshot.exists();
-      res.status(200).send({ exists });
-    } catch (error) {
-      res.status(500).send({ error: error.message });
-    }
-  });
-
-// Start the server
+// --- Start Server --- //
 const PORT = 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
