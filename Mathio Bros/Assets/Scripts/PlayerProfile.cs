@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using static FirebaseAPIManager;
+using UnityEngine.Networking;
 
 public class ProfilePage : MonoBehaviour
 {
@@ -35,4 +37,27 @@ public class ProfilePage : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu");
     }
+
+    public void LoadPlayerData(string playerId)
+    {
+        StartCoroutine(FirebaseAPIManager.Instance.GetPlayerData(
+            playerId,
+            (success, jsonData) => {
+                if (success)
+                {
+                    PlayerData data = JsonUtility.FromJson<PlayerData>(jsonData);
+
+                    // Update UI
+                    nameText.text = data.name;
+                    levelsSolvedText.text = $"Levels Solved: {data.level}";
+                    //scoreText.text = $"Score: {data.score}";
+                }
+                else
+                {
+                    Debug.LogError($"Data fetch failed: {jsonData}");
+                }
+            }
+        ));
+    }
+
 }
