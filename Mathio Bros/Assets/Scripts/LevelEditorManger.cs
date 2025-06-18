@@ -7,11 +7,6 @@ public class LevelEditorManger : MonoBehaviour
     public GameObject[] ItemImage;
     public int CurrentButtonPressed;
 
-    private void Start()
-    {
-        Debug.Log("Level Editor Manager started. Number of item buttons: " + ItemButtons.Length);
-    }
-
 
     private void Update()
     {

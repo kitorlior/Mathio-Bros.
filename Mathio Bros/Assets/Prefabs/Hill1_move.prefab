@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1890495128965525058}
   - component: {fileID: 5258393788528371144}
-  - component: {fileID: -6285232573943857016}
+  - component: {fileID: -5024031208303614831}
   m_Layer: 0
-  m_Name: Hill1
-  m_TagString: Untagged
+  m_Name: Hill1_move
+  m_TagString: ItemImage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -88,7 +88,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-6285232573943857016
+--- !u!114 &-5024031208303614831
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -97,7 +97,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 8683066835176861829}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a9ffc8fa0d13d54295bec0e9d51c98e, type: 3}
+  m_Script: {fileID: 11500000, guid: 93f65e0676a437245be95adcbb22c6e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ID: 3
