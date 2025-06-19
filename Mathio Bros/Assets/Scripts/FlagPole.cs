@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -66,7 +67,9 @@ public class FlagPole : MonoBehaviour
 
         player.gameObject.SetActive(false); // "mario enters castle"
 
-        SceneManager.LoadScene(nextLevelName);
+        if (GameManager.Instance.isMulti) { if (PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel(nextLevelName); }
+        else { SceneManager.LoadScene(nextLevelName); }
+            
         GameManager.Instance.levelName = nextLevelName;
         Debug.Log("next level!");
     }

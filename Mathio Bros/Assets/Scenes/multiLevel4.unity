@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 36188828}
   - component: {fileID: 36188829}
   m_Layer: 0
-  m_Name: f(x)=x
+  m_Name: f(x)=e^x
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -291,7 +291,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 86ce375a448a95e4d93a14733878a82c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 2d27c97174b9a944aa7be16d11234983, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1765,8 +1765,8 @@ Transform:
   m_Children:
   - {fileID: 1491849585}
   - {fileID: 2023001235}
-  - {fileID: 1959643498}
   - {fileID: 36188828}
+  - {fileID: 1959643498}
   m_Father: {fileID: 494019729}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &390879857
@@ -2506,10 +2506,10 @@ PrefabInstance:
     - target: {fileID: 5021801870144132365, guid: 4e35ed7c3b247824191d175f3d8030b0, type: 3}
       propertyPath: connection
       value: 
-      objectReference: {fileID: 1313381759}
+      objectReference: {fileID: 800074917}
     - target: {fileID: 5021801870144132365, guid: 4e35ed7c3b247824191d175f3d8030b0, type: 3}
       propertyPath: exitDirection.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2750,7 +2750,11 @@ PrefabInstance:
     - target: {fileID: 5021801870144132365, guid: 4e35ed7c3b247824191d175f3d8030b0, type: 3}
       propertyPath: connection
       value: 
-      objectReference: {fileID: 800074917}
+      objectReference: {fileID: 1313381759}
+    - target: {fileID: 5021801870144132365, guid: 4e35ed7c3b247824191d175f3d8030b0, type: 3}
+      propertyPath: exitDirection.y
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4200,7 +4204,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: f(x)=x
+  m_text: f(x) = 4
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 002f63aa4e28c564b87e63e53b65f2be, type: 2}
   m_sharedMaterial: {fileID: 4219543857730994400, guid: 002f63aa4e28c564b87e63e53b65f2be, type: 2}
@@ -4643,7 +4647,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 020f64bc21e2d3747b639d3ba45ae101, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  levelName: MultiLevel
+  levelName: multiLevel4
   isMulti: 1
 --- !u!4 &1455544085
 Transform:
@@ -4750,7 +4754,7 @@ GameObject:
   - component: {fileID: 1491849585}
   - component: {fileID: 1491849586}
   m_Layer: 0
-  m_Name: f(x)=-x^2
+  m_Name: f(x)=-x
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4815,7 +4819,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 8752c63cd6481214fa7cbe6129c975b6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 86506bb61f5fb3b4992d7af2feec87da, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4840,7 +4844,7 @@ PrefabInstance:
       objectReference: {fileID: 196384819}
     - target: {fileID: -6651664131533321248, guid: c43bf9149006ee443bf914eeb45fe089, type: 3}
       propertyPath: nextLevelName
-      value: multiLevel1
+      value: multiLevel
       objectReference: {fileID: 0}
     - target: {fileID: 2656266565893952715, guid: c43bf9149006ee443bf914eeb45fe089, type: 3}
       propertyPath: m_Name
@@ -5588,7 +5592,7 @@ GameObject:
   - component: {fileID: 1959643498}
   - component: {fileID: 1959643499}
   m_Layer: 0
-  m_Name: f(x)=e^x
+  m_Name: f(x)=4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5653,7 +5657,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 2d27c97174b9a944aa7be16d11234983, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 0fe01fdd2c04fdc4ca90d8932371467e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

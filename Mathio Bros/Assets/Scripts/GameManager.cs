@@ -104,7 +104,15 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
         {
-            PhotonNetwork.LoadLevel("MultiLevel");
+            PhotonNetwork.LoadLevel(levelName);
+        }
+    }
+
+    public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel(levelName);
         }
     }
 
@@ -195,7 +203,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         Lives = 3;
         if (isMulti)
         {
-            PhotonNetwork.LeaveRoom();
+            PhotonNetwork.Disconnect();
         }
         SceneManager.LoadScene("MainMenu");
     }
