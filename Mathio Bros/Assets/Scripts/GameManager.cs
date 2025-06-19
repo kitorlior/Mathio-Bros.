@@ -116,10 +116,10 @@ public class GameManager : MonoBehaviourPunCallbacks
         Debug.Log("Restarting level");
         if (!isMulti) Lives--;
 
-        if (isMulti)
-        {
-            photonView.RPC("UpdateLives", RpcTarget.All, Lives-1);
-        }
+        //if (isMulti)
+        //{
+        //    photonView.RPC("UpdateLives", RpcTarget.All, Lives-1);
+        //}
         ;
 
         if (Lives > 0)
