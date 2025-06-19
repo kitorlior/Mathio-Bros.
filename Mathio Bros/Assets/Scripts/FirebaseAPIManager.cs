@@ -13,7 +13,7 @@ public class FirebaseAPIManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                GameObject go = new GameObject("FirebaseAPIManager");
+                GameObject go = new("FirebaseAPIManager");
                 _instance = go.AddComponent<FirebaseAPIManager>();
                 DontDestroyOnLoad(go);
             }
@@ -27,7 +27,7 @@ public class FirebaseAPIManager : MonoBehaviour
         public string playerId;
         public string name;
         public string email;
-        public int level;
+        public string level;
         public int score;
         public float timeSpent;
         public string classId;
@@ -49,7 +49,7 @@ public class FirebaseAPIManager : MonoBehaviour
     // 1. Authentication Methods
     public IEnumerator SignUp(string email, string password, string username, AuthCallback callback)
     {
-        AuthData authData = new AuthData
+        AuthData authData = new()
         {
             email = email,
             password = password,
@@ -58,24 +58,22 @@ public class FirebaseAPIManager : MonoBehaviour
 
         string json = JsonUtility.ToJson(authData);
 
-        using (UnityWebRequest request = new UnityWebRequest($"{SERVER_URL}/signup", "POST"))
+        using UnityWebRequest request = new UnityWebRequest($"{SERVER_URL}/signup", "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            yield return request.SendWebRequest();
-
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                callback(false, request.error, null);
-            }
-            else
-            {
-                var response = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
-                callback(response.success, response.message, response.uid);
-            }
+            callback(false, request.error, null);
+        }
+        else
+        {
+            var response = JsonUtility.FromJson<AuthResponse>(request.downloadHandler.text);
+            callback(response.success, response.message, response.uid);
         }
     }
 
@@ -111,12 +109,12 @@ public class FirebaseAPIManager : MonoBehaviour
     }
 
     // 2. Player Data Methods (existing)
-    public IEnumerator SavePlayerData(string playerId, int level, int score, float timeSpent, DataCallback callback = null)
+    public IEnumerator SavePlayerData(string playerId, string levelName, int score, float timeSpent, DataCallback callback = null)
     {
         PlayerData data = new PlayerData
         {
             playerId = playerId,
-            level = level,
+            level = levelName,
             score = score,
             timeSpent = timeSpent
         };
@@ -155,5 +153,31 @@ public class FirebaseAPIManager : MonoBehaviour
         public bool success;
         public string message;
         public string uid;
+    }
+
+    public IEnumerator UpdatePlayerData(string playerId, string levelName, int score, float timeSpent, DataCallback callback = null)
+    {
+        var updatePayload = new PlayerData
+        {
+            playerId = playerId,
+            level = levelName,
+            score = score,
+            timeSpent = timeSpent
+        };
+
+        string json = JsonUtility.ToJson(updatePayload);
+
+        using (UnityWebRequest request = new UnityWebRequest($"{SERVER_URL}/updatePlayerData", "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            bool success = request.result == UnityWebRequest.Result.Success;
+            callback?.Invoke(success, success ? request.downloadHandler.text : request.error);
+        }
     }
 }

@@ -149,20 +149,42 @@ app.get("/getLevelParams/:levelId", async (req, res) => {
   }
 });
 
-// 6. Check if email or username exists
-app.get("/checkUser", async (req, res) => {
-  const { field, value } = req.query; // field = 'email' or 'username'
+// Update Player Data: add score and timeSpent, update level if higher
+app.post("/updatePlayerData", async (req, res) => {
+  const { playerId, score, timeSpent, level } = req.body;
+
+  if (!playerId || score == null || timeSpent == null || level == null) {
+    return res.status(400).send({ success: false, message: "Missing fields" });
+  }
 
   try {
-    const snapshot = await db
-      .ref("users")
-      .orderByChild(field)
-      .equalTo(value)
-      .once("value");
-    const exists = snapshot.exists();
-    res.status(200).send({ exists });
+    const ref = db.ref(`players/${playerId}`);
+    const snapshot = await ref.once("value");
+    const currentData = snapshot.val() || {};
+
+    const updatedScore = (currentData.score || 0) + score;
+    const updatedTimeSpent = (currentData.timeSpent || 0) + timeSpent;
+    const updatedLevel = level;
+
+    await ref.update({
+      score: updatedScore,
+      timeSpent: updatedTimeSpent,
+      level: updatedLevel,
+      lastUpdated: new Date().toISOString(),
+    });
+
+    res.status(200).send({
+      success: true,
+      message: "Player data updated",
+      score: updatedScore,
+      timeSpent: updatedTimeSpent,
+      level: updatedLevel,
+    });
   } catch (error) {
-    res.status(500).send({ success: false, message: error.message });
+    console.error(error);
+    res
+      .status(500)
+      .send({ success: false, message: "Failed to update player data" });
   }
 });
 

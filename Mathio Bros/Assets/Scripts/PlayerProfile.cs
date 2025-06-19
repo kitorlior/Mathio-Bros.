@@ -6,25 +6,23 @@ using UnityEngine.Networking;
 
 public class ProfilePage : MonoBehaviour
 {
-    public Text nameText;
     public Text hoursPlayedText;
-    public Text levelsSolvedText;
-    public Text averageTimeText;
+    public Text LevelText;
+    public Text scoreText;
 
     private void Start()
     {
-        // Load player data (example values)
-        nameText.text = "Player Name: " + PlayerPrefs.GetString("PlayerName", "Guest");
-        hoursPlayedText.text = "Hours Played: " + PlayerPrefs.GetFloat("HoursPlayed", 0).ToString("F2");
-        levelsSolvedText.text = "Levels Solved: " + PlayerPrefs.GetInt("LevelsSolved", 0);
-        averageTimeText.text = "Average Solving Time: " + PlayerPrefs.GetFloat("AverageTime", 0).ToString("F2") + "s";
 
         StartCoroutine(FirebaseAPIManager.Instance.GetPlayerData(SaveUserId.Instance.UserId, (success, dataOrError) =>
         {
             if (success)
             {
-                Debug.Log("Received player data: " + dataOrError);
-                // Parse JSON: PlayerData data = JsonUtility.FromJson<PlayerData>(dataOrError);
+                PlayerData data = JsonUtility.FromJson<PlayerData>(dataOrError);
+
+                // Update UI
+                hoursPlayedText.text = $"Minutes Played: {(data.timeSpent / 60):F2}";
+                LevelText.text = $"Last Level Solved: {data.level}";
+                scoreText.text = $"Score: {data.score}";
             }
             else
             {
@@ -36,28 +34,6 @@ public class ProfilePage : MonoBehaviour
     public void OnBackClicked()
     {
         SceneManager.LoadScene("MainMenu");
-    }
-
-    public void LoadPlayerData(string playerId)
-    {
-        StartCoroutine(FirebaseAPIManager.Instance.GetPlayerData(
-            playerId,
-            (success, jsonData) => {
-                if (success)
-                {
-                    PlayerData data = JsonUtility.FromJson<PlayerData>(jsonData);
-
-                    // Update UI
-                    nameText.text = data.name;
-                    levelsSolvedText.text = $"Levels Solved: {data.level}";
-                    //scoreText.text = $"Score: {data.score}";
-                }
-                else
-                {
-                    Debug.LogError($"Data fetch failed: {jsonData}");
-                }
-            }
-        ));
     }
 
 }

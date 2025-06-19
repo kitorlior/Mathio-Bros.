@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using Photon.Pun;
+using System;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -13,6 +14,8 @@ public class GameManager : MonoBehaviourPunCallbacks
     public int Coins { get; private set; }
     public event System.Action<int> OnLivesChanged;
     public bool isMulti = false;
+
+    public DateTime startTime;
 
     //static bool flag = false;
 
@@ -33,13 +36,13 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
         else
         {
+            startTime = DateTime.Now;
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
                 Debug.Log("gamemanager already exists");
                 return;
             }
-
             Instance = this;
             DontDestroyOnLoad(gameObject);
             Debug.Log("set game manager instance");

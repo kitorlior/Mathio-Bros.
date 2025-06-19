@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -24,8 +25,28 @@ public class FlagPole : MonoBehaviour
             return;
         if (complete)
         {
+            if (!GameManager.Instance.isMulti) 
+            {
+                Debug.Log("starting update to firebase");
+                int score = GameManager.Instance.Lives * 100;
+                int timeSpent = (int)(DateTime.Now.Subtract(GameManager.Instance.startTime)).TotalSeconds;
+                GameManager.Instance.startTime = DateTime.Now;
+                StartCoroutine(FirebaseAPIManager.Instance.UpdatePlayerData(SaveUserId.Instance.UserId, GameManager.Instance.levelName, score, timeSpent, (success, message) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log(message);
+                        // Parse JSON: PlayerData data = JsonUtility.FromJson<PlayerData>(dataOrError);
+                    }
+                    else
+                    {
+                        Debug.LogError(message);
+                    }
+                }));
+            }
             StartCoroutine(MoveTo(flag, poleBottom.position)); // move flag to bottom of flagpole
             StartCoroutine(LevelCompleteSequence(collision.transform)); // move mario to castle in a few stages
+
         }
         else
         {

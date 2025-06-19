@@ -59,7 +59,7 @@ public class SignUp : MonoBehaviour
                     // Save initial player data
                     StartCoroutine(FirebaseAPIManager.Instance.SavePlayerData(
                         uid,
-                        1, // Starting level
+                        "from signUp", // Starting level
                         0, // Starting score
                         0f, // Time spent
                         (saveSuccess, saveMessage) => {
