@@ -34,9 +34,9 @@ public class EquationLogic : MonoBehaviour
 
     public void CheckHit(int number)
     {
-        if (flagPole.isIntegralLevel && number.ToString() == res)
+        if (flagPole.isIntegralLevel)
         {
-            isIntegralHit = true;
+            if (number.ToString() == res) { isIntegralHit = true; }
             return;
         }
         if (!isFirstHit && firstNumber.text == number.ToString())
