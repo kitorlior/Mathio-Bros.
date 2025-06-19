@@ -3,7 +3,7 @@ using TMPro;
 
 public class ChangeText : MonoBehaviour
 {
-    private void Awake()
+    private void Start()
     {
         GameManager gameManager = GameManager.Instance;
         TMP_Text text = GetComponent<TMP_Text>();

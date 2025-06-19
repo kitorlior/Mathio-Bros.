@@ -12,8 +12,9 @@ public class SideScroll : MonoBehaviourPunCallbacks
     public float height = 7f;
     public float undergroundHeight = -9f;
 
-    private void Awake()
+    private void Start()
     {
+        
         if (!GameManager.Instance.isMulti)
             player = GameObject.FindGameObjectWithTag("Player").transform;
     }

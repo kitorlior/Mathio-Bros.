@@ -36,11 +36,13 @@ public class GameManager : MonoBehaviourPunCallbacks
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
+                Debug.Log("gamemanager already exists");
                 return;
             }
 
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Debug.Log("set game manager instance");
         }
 
         Lives = 3;
