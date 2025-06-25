@@ -3,26 +3,8 @@ using UnityEngine.SceneManagement;
 
 public class LevelPickerManger : MonoBehaviour
 {
-    public void Level1clicked()
+    public void chooseLevel(string levelName)
     {
-        SceneManager.LoadScene("Level1");
-    }
-
-    public void Level2clicked()
-    {
-        SceneManager.LoadScene("Level2");
-    }
-    public void Level3clicked()
-    {
-        SceneManager.LoadScene("Level3");
-    }
-
-    public void OnSignOutClicked()
-    {
-        SceneManager.LoadScene("LandingPage");
-    }
-    public void OnBackClicked()
-    {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene(levelName);
     }
 }
