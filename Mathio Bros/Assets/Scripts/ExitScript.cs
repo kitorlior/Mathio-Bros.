@@ -11,4 +11,9 @@ public class ExitScript : MonoBehaviour
         PhotonNetwork.Disconnect();
         SceneManager.LoadScene("MainMenu");
     }
+
+    public void SinglePlayer()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }
