@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 4479215768019427655}
   - component: {fileID: 1891277057359129565}
   - component: {fileID: 6630908162358269095}
-  - component: {fileID: 6724858093351653899}
+  - component: {fileID: -2141766819401064136}
   m_Layer: 0
-  m_Name: MysteryBlock
-  m_TagString: Untagged
+  m_Name: MysteryBlock 1_move
+  m_TagString: ItemImage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -164,7 +164,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 0715cdc25e9f34b498a3ee95abae433e, type: 3}
   - {fileID: 21300000, guid: dfbcafe6a785dba4a9c89c6fbb4ec38f, type: 3}
   - {fileID: 21300000, guid: 78dfd1874712840468f798c2cfb0864f, type: 3}
---- !u!114 &6724858093351653899
+--- !u!114 &-2141766819401064136
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -173,7 +173,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 286977051267466203}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a9ffc8fa0d13d54295bec0e9d51c98e, type: 3}
+  m_Script: {fileID: 11500000, guid: 93f65e0676a437245be95adcbb22c6e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ID: 4
