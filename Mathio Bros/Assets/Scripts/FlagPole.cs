@@ -18,8 +18,8 @@ public class FlagPole : MonoBehaviour
     {
         EquationLogic equationLogic = GameObject.Find("Equation Visualizer").GetComponent<EquationLogic>();
         bool complete = false;
-        bool equationComplete = isEquationLevel && equationLogic.isComplete;
-        bool integralComplete = isIntegralLevel && equationLogic.isIntegralHit;
+        bool equationComplete = isEquationLevel && equationLogic.IsComplete;
+        bool integralComplete = isIntegralLevel && equationLogic.IsIntegralHit;
         complete = equationComplete || integralComplete || !(isEquationLevel && isIntegralLevel);
         Debug.Log("isComplete: "+ complete);
         if (!collision.CompareTag("Player"))
