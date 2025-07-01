@@ -20,13 +20,15 @@ public class FlagPole : MonoBehaviour
         bool complete = false;
         bool equationComplete = isEquationLevel && equationLogic.IsComplete;
         bool integralComplete = isIntegralLevel && equationLogic.IsIntegralHit;
-        complete = equationComplete || integralComplete || !(isEquationLevel && isIntegralLevel);
+        complete = equationComplete || integralComplete || !(isEquationLevel || isIntegralLevel);
+        Debug.Log("equationComplete: " + equationComplete);
+        Debug.Log("integralComplete: " + integralComplete);
         Debug.Log("isComplete: "+ complete);
         if (!collision.CompareTag("Player"))
             return;
         if (complete)
         {
-            if (!GameManager.Instance.isMulti) 
+            if (!GameManager.Instance.isMulti && SaveUserId.Instance != null) 
             {
                 Debug.Log("starting update to firebase");
                 int score = GameManager.Instance.Lives * 100;
@@ -69,7 +71,7 @@ public class FlagPole : MonoBehaviour
 
         if (GameManager.Instance.isMulti) { if (PhotonNetwork.IsMasterClient) PhotonNetwork.LoadLevel(nextLevelName); }
         else { SceneManager.LoadScene(nextLevelName); }
-            
+        if (nextLevelName == "") { nextLevelName = "MainMenu"; }
         GameManager.Instance.levelName = nextLevelName;
         Debug.Log("next level!");
     }

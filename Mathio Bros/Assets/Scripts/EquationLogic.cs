@@ -68,37 +68,51 @@ public class EquationLogic : MonoBehaviour
     {
         Debug.Log("onclick");
         if (inputField != null) { equation = inputField.text; }
-        if (RegexValidator.IsValidEquation(equation)) { SetEquation(); }
-        SetNumberBlocks();
+        if (RegexValidator.IsValidEquation(equation))
+        {
+            SetEquation(); 
+            SetNumberBlocks();
+        }
+        
     }
 
     private bool SetNumberBlocks()
     {
         // Find the parent GameObject by name
         GameObject parentObject = GameObject.Find("Mystery");
-        int cnt = 0;
 
         if (parentObject == null) { return false; }
 
         // Get all components of a specific type from children (including the parent)
         BlockHit[] components = parentObject.GetComponentsInChildren<BlockHit>();
 
-        while (cnt < 2)
+        Vector3 firstPosition = Vector3.zero, secondPosition = Vector3.zero;
+
+        foreach (BlockHit block in components)
+        {
+            if (!block.isNum) { continue; }
+            block.isNum = false;
+            block.blockNumber = -1;
+        }
+
+        while (firstPosition == Vector3.zero || secondPosition == Vector3.zero)
         {
             int randomIndex = UnityEngine.Random.Range(0, components.Length);
-            if (!components[randomIndex].isNum && components[randomIndex].item == null)
+            if (components[randomIndex].item == null && components[randomIndex].transform.position != firstPosition && components[randomIndex].transform.position != secondPosition)
             {
-                if (cnt == 0)
+                if (firstPosition == Vector3.zero)
                 {
                     components[randomIndex].blockNumber = int.Parse(firstNumber.text);
-                    cnt++;
-                    Debug.Log("first num is at " + components[randomIndex].transform.position.ToString());
+                    components[randomIndex].isNum = true;
+                    firstPosition = components[randomIndex].transform.position;
+                    Debug.Log("first num is at " + firstPosition.ToString());
                 }
-                else
+                else if (firstPosition != Vector3.zero && components[randomIndex].transform.position != firstPosition)
                 {
                     components[randomIndex].blockNumber = int.Parse(secondNumber.text);
-                    cnt++;
-                    Debug.Log("second num is at " + components[randomIndex].transform.position.ToString());
+                    components[randomIndex].isNum = true;
+                    secondPosition = components[randomIndex].transform.position;
+                    Debug.Log("second num is at " + secondPosition.ToString());
                 }
             }
         }
