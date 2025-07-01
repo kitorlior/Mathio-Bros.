@@ -14,8 +14,9 @@ public class DeleteItemFromLevel : MonoBehaviour
     {
         if(Input.GetMouseButtonDown(1)) // Right mouse button
         {
+            Debug.Log("button clicked");
             // Find the item with the specified ID in the level editor manager
-            GameObject itemToDelete = GameObject.FindGameObjectWithTag("ItemImage");
+            GameObject itemToDelete = gameObject;
             if (itemToDelete != null)
             {
                 Destroy(itemToDelete); // Destroy the item
