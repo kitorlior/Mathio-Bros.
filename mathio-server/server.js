@@ -3,6 +3,7 @@ const admin = require("firebase-admin");
 const cors = require("cors");
 const app = express();
 const bcrypt = require("bcryptjs");
+const { v4: uuidv4 } = require("uuid");
 //const signInWithEmailAndPassword = require("firebase/auth");
 
 // --- Firebase Admin Initialization --- //
@@ -192,38 +193,77 @@ app.post("/updatePlayerData", async (req, res) => {
 app.post("/saveLevel", async (req, res) => {
   const { levelName, levelData } = req.body;
 
+  // Validate input
   if (!levelName || !levelData) {
-    return res.status(400).json({ success: false, message: "Missing level name or data" });
+    return res.status(400).json({
+      success: false,
+      message: "Missing level name or data",
+    });
   }
 
   try {
-    const levelId = uuidv4();
-    const createdAt = new Date().toISOString();
+    const levelsRef = db.ref("levels");
 
-    await db.ref(`levels/${levelId}`).set({
-      levelId,
-      levelName,
-      levelData: JSON.stringify(levelData),
-      createdAt
-    });
+    // 1. Check if a level with the same name exists
+    const existingSnap = await levelsRef
+      .orderByChild("levelName")
+      .equalTo(levelName)
+      .once("value");
 
-    res.status(200).json({ success: true, levelId });
+    const now = new Date().toISOString();
+
+    if (existingSnap.exists()) {
+      // 2. Level exists → update it
+      const existingLevelId = Object.keys(existingSnap.val())[0];
+      const existingRef = db.ref(`levels/${existingLevelId}`);
+
+      await existingRef.update({
+        levelData,
+        updatedAt: now,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Level updated",
+        levelId: existingLevelId,
+        updated: true,
+      });
+    } else {
+      // 3. Level does not exist → create new
+      const newLevelRef = levelsRef.push();
+      const levelId = newLevelRef.key;
+
+      await newLevelRef.set({
+        levelId,
+        levelName,
+        levelData,
+        createdAt: now,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Level created",
+        levelId,
+        updated: false,
+      });
+    }
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to save level" });
+    console.error("Error saving/updating level:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 
 // 7. Get All Levels (just names and IDs)
 app.get("/getLevels", async (req, res) => {
   try {
-    const snapshot = await db.ref('levels').once('value');
+    const snapshot = await db.ref("levels").once("value");
     const levels = [];
-    
+
     snapshot.forEach((childSnapshot) => {
       const level = childSnapshot.val();
       levels.push({
         id: level.levelId,
-        name: level.levelName
+        name: level.levelName,
       });
     });
 
@@ -238,11 +278,13 @@ app.get("/getLevelById/:levelId", async (req, res) => {
   const { levelId } = req.params;
 
   try {
-    const snapshot = await db.ref(`levels/${levelId}`).once('value');
+    const snapshot = await db.ref(`levels/${levelId}`).once("value");
     const levelData = snapshot.val();
 
     if (!levelData) {
-      return res.status(404).json({ success: false, message: "Level not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Level not found" });
     }
 
     res.status(200).json({
@@ -250,8 +292,8 @@ app.get("/getLevelById/:levelId", async (req, res) => {
       level: {
         id: levelData.levelId,
         name: levelData.levelName,
-        data: JSON.parse(levelData.levelData)
-      }
+        data: JSON.parse(levelData.levelData),
+      },
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to fetch level" });
@@ -263,28 +305,34 @@ app.get("/getLevelByName/:levelName", async (req, res) => {
   const { levelName } = req.params;
 
   try {
-    const snapshot = await db.ref('levels')
-      .orderByChild('levelName')
+    // Query for level with the exact name
+    const snapshot = await db
+      .ref("levels")
+      .orderByChild("levelName")
       .equalTo(levelName)
-      .once('value');
+      .once("value");
 
     if (!snapshot.exists()) {
-      return res.status(404).json({ success: false, message: "Level not found" });
+      return res.status(404).json({
+        success: false,
+        message: `Level "${levelName}" not found.`,
+      });
     }
 
-    // Get first match (or implement logic for multiple matches)
-    const levelData = Object.values(snapshot.val())[0];
+    const levels = snapshot.val();
+    const levelData = Object.values(levels)[0]; // Only one should exist
 
-    res.status(200).json({
+    console.log(levelData);
+
+    return res.status(200).json({
       success: true,
-      level: {
-        id: levelData.levelId,
-        name: levelData.levelName,
-        data: JSON.parse(levelData.levelData)
-      }
+      level: levelData.levelData,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to fetch level" });
+    console.error("Error fetching level by name:", error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch level" });
   }
 });
 

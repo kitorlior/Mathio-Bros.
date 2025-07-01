@@ -60,6 +60,11 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void mainMenu()
+    {
+        Lives = 3;
+    }
+
     private IEnumerator Start()
     {
         yield return null;
@@ -178,7 +183,7 @@ public class GameManager : MonoBehaviourPunCallbacks
                 player.enabled = false;
             }
         }
-
+        Lives = 3;
         Invoke(nameof(ReturnToMainMenu), 2f);
     }
 
@@ -205,6 +210,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.Disconnect();
         }
+        Lives = 3;
         SceneManager.LoadScene("MainMenu");
     }
 

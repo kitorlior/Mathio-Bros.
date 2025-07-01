@@ -8,7 +8,7 @@ public class DeleteItemFromLevel : MonoBehaviour
     void Start()
     {
         levelEditorManager = GameObject.FindGameObjectWithTag("LevelEditorManager").GetComponent<LevelEditorManger>();
-        gameObject.tag = "PlacedItem";
+        
     }
 
     private void OnMouseOver()

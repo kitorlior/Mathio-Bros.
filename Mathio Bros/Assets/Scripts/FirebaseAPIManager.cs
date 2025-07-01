@@ -181,27 +181,36 @@ public class FirebaseAPIManager : MonoBehaviour
         }
     }
     // Save Level
-    public IEnumerator SaveLevel(string levelName, string levelJson, System.Action<bool, string> callback)
+    public IEnumerator SaveLevel(string levelName, LevelData levelData, DataCallback callback)
     {
-        WWWForm form = new WWWForm();
-        form.AddField("levelName", levelName);
-        form.AddField("levelData", levelJson);
 
-        using (UnityWebRequest request = UnityWebRequest.Post($"{SERVER_URL}/saveLevel", form))
+        LevelUploadWrapper wrapper = new LevelUploadWrapper
         {
-            yield return request.SendWebRequest();
+            levelName = levelName,
+            levelData = levelData
+        };
+        string jsonPayload = JsonUtility.ToJson(wrapper);
+        Debug.Log(jsonPayload);
 
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Save failed: " + request.error);
-                callback(false, null);
-            }
-            else
-            {
-                var response = JsonUtility.FromJson<SaveResponse>(request.downloadHandler.text);
-                callback(response.success, response.levelId);
-            }
+        UnityWebRequest request = new UnityWebRequest($"{SERVER_URL}/saveLevel", "POST");
+        byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonPayload);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result != UnityWebRequest.Result.Success)
+        {
+            Debug.LogError($"Save failed: {request.error}\nResponse: {request.downloadHandler.text}");
+            callback(false, null);
         }
+        else
+        {
+            var response = JsonUtility.FromJson<SaveResponse>(request.downloadHandler.text);
+            callback(response.success, response.levelId);
+        }
+
     }
 
     // Get All Levels (just names and IDs)
@@ -225,7 +234,7 @@ public class FirebaseAPIManager : MonoBehaviour
     }
 
     // Get Level Data by ID
-    public IEnumerator GetLevelById(string levelId, System.Action<bool, string> callback)
+    public IEnumerator GetLevelById(string levelId, System.Action<bool, LevelData> callback)
     {
         using (UnityWebRequest request = UnityWebRequest.Get($"{SERVER_URL}/getLevelById/{levelId}"))
         {
@@ -239,13 +248,13 @@ public class FirebaseAPIManager : MonoBehaviour
             else
             {
                 var response = JsonUtility.FromJson<LevelDataResponse>(request.downloadHandler.text);
-                callback(response.success, response.level.data);
+                callback(response.success, response.level);
             }
         }
     }
 
     // Get Level Data by Name
-    public IEnumerator GetLevelByName(string levelName, System.Action<bool, string> callback)
+    public IEnumerator GetLevelByName(string levelName, System.Action<bool, LevelData> callback)
     {
         using (UnityWebRequest request = UnityWebRequest.Get($"{SERVER_URL}/getLevelByName/{levelName}"))
         {
@@ -259,7 +268,7 @@ public class FirebaseAPIManager : MonoBehaviour
             else
             {
                 var response = JsonUtility.FromJson<LevelDataResponse>(request.downloadHandler.text);
-                callback(response.success, response.level.data);
+                callback(response.success, response.level);
             }
         }
     }
@@ -293,11 +302,16 @@ public class FirebaseAPIManager : MonoBehaviour
         public LevelData level;
     }
 
+    //[System.Serializable]
+    //private class LevelData
+    //{
+    //    public string name;
+    //    public string data;
+    //}
     [System.Serializable]
-    private class LevelData
+    public class LevelUploadWrapper
     {
-        public string id;
-        public string name;
-        public string data;
+        public string levelName;
+        public LevelData levelData;
     }
 }

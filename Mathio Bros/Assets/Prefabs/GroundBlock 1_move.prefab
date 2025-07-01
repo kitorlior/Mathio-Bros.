@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1934862640538012576}
   - component: {fileID: 6364444311487942916}
   - component: {fileID: -2161722726950568066}
-  - component: {fileID: -8274854016452369046}
   m_Layer: 0
   m_Name: GroundBlock 1_move
   m_TagString: ItemImage
@@ -146,18 +145,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 93f65e0676a437245be95adcbb22c6e7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &-8274854016452369046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 846576251648757930}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a9ffc8fa0d13d54295bec0e9d51c98e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ID: 7

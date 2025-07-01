@@ -16,7 +16,8 @@ public class LevelEditorManger : MonoBehaviour
         if (Input.GetMouseButtonDown(0) && ItemButtons[CurrentButtonPressed].Clicked) // Left mouse button
         {
             ItemButtons[CurrentButtonPressed].Clicked=false;
-            Instantiate(ItemPrefabs[CurrentButtonPressed], new Vector3(worldPosition.x, worldPosition.y, 0), Quaternion.identity);
+            GameObject obj = Instantiate(ItemPrefabs[CurrentButtonPressed], new Vector3(worldPosition.x, worldPosition.y, 0), Quaternion.identity);
+            obj.tag = "PlacedItem";
             Destroy(GameObject.FindGameObjectWithTag("ItemImage")); // Destroy the item image if it exists
             Debug.Log("Item ID: " + CurrentButtonPressed + " placed at position: " + worldPosition);
         }

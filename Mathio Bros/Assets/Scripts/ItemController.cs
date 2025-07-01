@@ -21,7 +21,7 @@ public class ItemController : MonoBehaviour
             Vector2 screenPosition = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             Vector2 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
             Clicked = true;
-            Instantiate(levelEditorManager.ItemImage[ID], new Vector3(worldPosition.x, worldPosition.y, 0), Quaternion.identity);
+            GameObject obj = Instantiate(levelEditorManager.ItemImage[ID], new Vector3(worldPosition.x, worldPosition.y, 0), Quaternion.identity);
             Quantity--;
             QuantityText.text = Quantity.ToString();
             levelEditorManager.CurrentButtonPressed = ID; // Update the current button pressed in the level editor manager
