@@ -180,4 +180,124 @@ public class FirebaseAPIManager : MonoBehaviour
             callback?.Invoke(success, success ? request.downloadHandler.text : request.error);
         }
     }
+    // Save Level
+    public IEnumerator SaveLevel(string levelName, string levelJson, System.Action<bool, string> callback)
+    {
+        WWWForm form = new WWWForm();
+        form.AddField("levelName", levelName);
+        form.AddField("levelData", levelJson);
+
+        using (UnityWebRequest request = UnityWebRequest.Post($"{SERVER_URL}/saveLevel", form))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Save failed: " + request.error);
+                callback(false, null);
+            }
+            else
+            {
+                var response = JsonUtility.FromJson<SaveResponse>(request.downloadHandler.text);
+                callback(response.success, response.levelId);
+            }
+        }
+    }
+
+    // Get All Levels (just names and IDs)
+    public IEnumerator GetLevels(System.Action<bool, List<LevelMetaData>> callback)
+    {
+        using (UnityWebRequest request = UnityWebRequest.Get($"{SERVER_URL}/getLevels"))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Fetch failed: " + request.error);
+                callback(false, null);
+            }
+            else
+            {
+                var response = JsonUtility.FromJson<LevelListResponse>(request.downloadHandler.text);
+                callback(response.success, response.levels);
+            }
+        }
+    }
+
+    // Get Level Data by ID
+    public IEnumerator GetLevelById(string levelId, System.Action<bool, string> callback)
+    {
+        using (UnityWebRequest request = UnityWebRequest.Get($"{SERVER_URL}/getLevelById/{levelId}"))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Fetch failed: " + request.error);
+                callback(false, null);
+            }
+            else
+            {
+                var response = JsonUtility.FromJson<LevelDataResponse>(request.downloadHandler.text);
+                callback(response.success, response.level.data);
+            }
+        }
+    }
+
+    // Get Level Data by Name
+    public IEnumerator GetLevelByName(string levelName, System.Action<bool, string> callback)
+    {
+        using (UnityWebRequest request = UnityWebRequest.Get($"{SERVER_URL}/getLevelByName/{levelName}"))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Fetch failed: " + request.error);
+                callback(false, null);
+            }
+            else
+            {
+                var response = JsonUtility.FromJson<LevelDataResponse>(request.downloadHandler.text);
+                callback(response.success, response.level.data);
+            }
+        }
+    }
+
+    // Data classes
+    [System.Serializable]
+    private class SaveResponse
+    {
+        public bool success;
+        public string levelId;
+    }
+
+    [System.Serializable]
+    public class LevelMetaData
+    {
+        public string id;
+        public string name;
+    }
+
+    [System.Serializable]
+    private class LevelListResponse
+    {
+        public bool success;
+        public List<LevelMetaData> levels;
+    }
+
+    [System.Serializable]
+    private class LevelDataResponse
+    {
+        public bool success;
+        public LevelData level;
+    }
+
+    [System.Serializable]
+    private class LevelData
+    {
+        public string id;
+        public string name;
+        public string data;
+    }
 }
