@@ -337,7 +337,7 @@ app.get("/getLevelByName/:levelName", async (req, res) => {
 });
 
 // --- Start Server --- //
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
