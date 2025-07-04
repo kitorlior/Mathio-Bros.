@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public void mainMenu()
+    public void MainMenu()
     {
         Lives = 3;
     }
@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void UpdateLivesUI()
     {
-        TMP_Text livesText = GameObject.Find("Lives Text")?.GetComponent<TMP_Text>();
+        TMP_Text livesText = GameObject.Find("Lives Text").GetComponent<TMP_Text>();
         if (livesText != null)
         {
             livesText.text = Lives.ToString();
@@ -169,7 +169,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     private void GameOver()
     {
-        var gameOverText = GameObject.Find("Game Over Text")?.GetComponent<TMP_Text>();
+        var gameOverText = GameObject.Find("Game Over Text").GetComponent<TMP_Text>();
         if (gameOverText != null)
         {
             gameOverText.enabled = true;
@@ -177,7 +177,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
         if (!isMulti)
         {
-            var player = GameObject.Find("Mario")?.GetComponent<PlayerMovement>();
+            var player = GameObject.Find("Mario").GetComponent<PlayerMovement>();
             if (player != null)
             {
                 player.enabled = false;
