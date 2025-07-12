@@ -17,4 +17,10 @@ public class ExitScript : MonoBehaviour
         SceneManager.LoadScene("MainMenu");
         GameManager.Instance.MainMenu();
     }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
 }
